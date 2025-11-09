@@ -1,12 +1,11 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { Icon } from 'leaflet';
-import { useEffect } from 'react';
-import 'leaflet/dist/leaflet.css';
-import './MapView.css';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { Icon } from "leaflet";
+import { useEffect } from "react";
+import "leaflet/dist/leaflet.css";
 
 // Fix for default marker icons in react-leaflet
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
 const DefaultIcon = new Icon({
   iconUrl: icon,
@@ -14,24 +13,31 @@ const DefaultIcon = new Icon({
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+  shadowSize: [41, 41],
 });
 
 // Component to handle map view changes when destination is selected
 function MapController({ selectedDestination, destinations }) {
   const map = useMap();
-  
+
   useEffect(() => {
     if (selectedDestination) {
       map.setView(
-        [selectedDestination.coordinates.lat, selectedDestination.coordinates.lng],
+        [
+          selectedDestination.coordinates.lat,
+          selectedDestination.coordinates.lng,
+        ],
         12,
         { animate: true, duration: 1 }
       );
     } else if (destinations && destinations.length > 0) {
       // Center on average of all destinations if no selection
-      const avgLat = destinations.reduce((sum, d) => sum + d.coordinates.lat, 0) / destinations.length;
-      const avgLng = destinations.reduce((sum, d) => sum + d.coordinates.lng, 0) / destinations.length;
+      const avgLat =
+        destinations.reduce((sum, d) => sum + d.coordinates.lat, 0) /
+        destinations.length;
+      const avgLng =
+        destinations.reduce((sum, d) => sum + d.coordinates.lng, 0) /
+        destinations.length;
       map.setView([avgLat, avgLng], destinations.length > 1 ? 4 : 6);
     }
   }, [selectedDestination, destinations, map]);
@@ -39,18 +45,29 @@ function MapController({ selectedDestination, destinations }) {
   return null;
 }
 
-const MapView = ({ destinations, selectedDestination, onSelectDestination }) => {
+const MapView = ({
+  destinations,
+  selectedDestination,
+  onSelectDestination,
+}) => {
   // Calculate center of map based on destinations
   const getMapCenter = () => {
     if (selectedDestination) {
-      return [selectedDestination.coordinates.lat, selectedDestination.coordinates.lng];
+      return [
+        selectedDestination.coordinates.lat,
+        selectedDestination.coordinates.lng,
+      ];
     }
     if (destinations.length > 0) {
-      const avgLat = destinations.reduce((sum, d) => sum + d.coordinates.lat, 0) / destinations.length;
-      const avgLng = destinations.reduce((sum, d) => sum + d.coordinates.lng, 0) / destinations.length;
+      const avgLat =
+        destinations.reduce((sum, d) => sum + d.coordinates.lat, 0) /
+        destinations.length;
+      const avgLng =
+        destinations.reduce((sum, d) => sum + d.coordinates.lng, 0) /
+        destinations.length;
       return [avgLat, avgLng];
     }
-    return [36.8794, 10.3300]; // Default to Tunis, Tunisia
+    return [36.8794, 10.33]; // Default to Tunis, Tunisia
   };
 
   const getMapZoom = () => {
@@ -72,8 +89,11 @@ const MapView = ({ destinations, selectedDestination, onSelectDestination }) => 
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           />
-          <MapController selectedDestination={selectedDestination} destinations={destinations} />
-          {destinations.map(dest => (
+          <MapController
+            selectedDestination={selectedDestination}
+            destinations={destinations}
+          />
+          {destinations.map((dest) => (
             <Marker
               key={dest.id}
               position={[dest.coordinates.lat, dest.coordinates.lng]}
@@ -100,4 +120,3 @@ const MapView = ({ destinations, selectedDestination, onSelectDestination }) => 
 };
 
 export default MapView;
-
