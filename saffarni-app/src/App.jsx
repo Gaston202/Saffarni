@@ -1,14 +1,15 @@
-import { useState } from "react";
-import "./App.css";
-import { Button } from "@/components/ui/button";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import SignUp from "./Pages/SignUp";
+import Login from "./Pages/Login";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
-      <Button variant="outline">Button</Button>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </Router>
   );
 }
 
