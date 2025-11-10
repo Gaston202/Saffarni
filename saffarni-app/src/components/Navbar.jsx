@@ -35,11 +35,11 @@ const Navbar = () => {
             </Button>
           </div>
           <div className="hidden items-center gap-4 lg:flex">
-            <Button variant="link" className="text-black">
-              Sign in
+            <Button variant="link" className="text-black" asChild>
+              <Link to="/login">Sign in</Link>
             </Button>
-            <Button variant="link" className="text-[#DF6951]">
-              Start for free
+            <Button variant="link" className="text-[#DF6951]" asChild>
+              <Link to="/signup">Start for free</Link>
             </Button>
           </div>
         </nav>

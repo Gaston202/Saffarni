@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { destinations } from "../data/destinations";
-import PreferencesSidebar from "./PreferencesSidebar";
-import DestinationCard from "./DestinationCard";
-import MapView from "./MapView";
+import PreferencesSidebar from "../components/PreferencesSidebar";
+import DestinationCard from "../components/DestinationCard";
+import MapView from "../components/MapView";
 
 const RecommendationPage = () => {
   const navigate = useNavigate();
