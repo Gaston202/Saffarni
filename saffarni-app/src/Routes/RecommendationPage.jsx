@@ -63,18 +63,18 @@ const RecommendationPage = () => {
   const [selectedDestination, setSelectedDestination] = useState(null);
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-[1800px] mx-auto grid grid-cols-[320px_1fr_400px] gap-8">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8">
+      <div className="max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr_400px] gap-4 sm:gap-6 lg:gap-8">
         <PreferencesSidebar
           preferences={preferences}
           setPreferences={setPreferences}
         />
 
-        <div className="flex flex-col gap-6">
-          <h2 className="text-3xl font-semibold text-foreground">
+        <div className="flex flex-col gap-4 sm:gap-6">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-foreground">
             Recommended Destinations
           </h2>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6 overflow-y-auto max-h-[calc(100vh-200px)] pr-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4 sm:gap-6 overflow-y-auto max-h-[calc(100vh-120px)] sm:max-h-[calc(100vh-160px)] lg:max-h-[calc(100vh-200px)] pr-2">
             {filteredDestinations.length > 0 ? (
               filteredDestinations.map((destination) => (
                 <DestinationCard
@@ -96,11 +96,13 @@ const RecommendationPage = () => {
           </div>
         </div>
 
-        <MapView
-          destinations={filteredDestinations}
-          selectedDestination={selectedDestination}
-          onSelectDestination={setSelectedDestination}
-        />
+        <div className="hidden xl:block">
+          <MapView
+            destinations={filteredDestinations}
+            selectedDestination={selectedDestination}
+            onSelectDestination={setSelectedDestination}
+          />
+        </div>
       </div>
     </div>
   );

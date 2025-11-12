@@ -21,12 +21,12 @@ const DestinationCard = ({ destination, onSelect, isSelected, onCustomize }) => 
   return (
     <Card 
       className={cn(
-        "overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:-translate-y-1",
+        "overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:-translate-y-1 w-full",
         isSelected && "ring-2 ring-primary"
       )}
       onClick={handleCardClick}
     >
-      <div className="relative w-full h-48 overflow-hidden">
+      <div className="relative w-full h-40 sm:h-48 overflow-hidden">
         <img 
           src={destination.image} 
           alt={destination.title}
@@ -43,8 +43,8 @@ const DestinationCard = ({ destination, onSelect, isSelected, onCustomize }) => 
           <Heart className="h-4 w-4" />
         </Button>
       </div>
-      <CardContent className="p-4">
-        <h3 className="text-xl font-semibold text-foreground mb-2">{destination.title}</h3>
+      <CardContent className="p-3 sm:p-4">
+        <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">{destination.title}</h3>
         <div className="flex items-center gap-1 text-muted-foreground text-sm mb-2">
           <span>📍</span>
           <span>{destination.location}</span>

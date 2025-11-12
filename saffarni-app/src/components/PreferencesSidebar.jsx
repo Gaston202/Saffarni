@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 
 const PreferencesSidebar = ({ preferences, setPreferences }) => {
@@ -48,18 +49,10 @@ const PreferencesSidebar = ({ preferences, setPreferences }) => {
     });
   };
 
-  const handleBudgetChange = (index, value) => {
-    const newBudget = [...localPreferences.budget];
-    newBudget[index] = parseInt(value);
-    if (index === 0 && newBudget[0] > newBudget[1]) {
-      newBudget[1] = newBudget[0];
-    }
-    if (index === 1 && newBudget[1] < newBudget[0]) {
-      newBudget[0] = newBudget[1];
-    }
+  const handleBudgetChange = (values) => {
     setLocalPreferences({
       ...localPreferences,
-      budget: newBudget
+      budget: values
     });
   };
 
@@ -68,7 +61,7 @@ const PreferencesSidebar = ({ preferences, setPreferences }) => {
   };
 
   return (
-    <Card className="sticky top-8 h-fit">
+    <Card className="sticky top-4 sm:top-8 h-fit">
       <CardHeader>
         <CardTitle>Your Preferences</CardTitle>
       </CardHeader>
@@ -110,29 +103,14 @@ const PreferencesSidebar = ({ preferences, setPreferences }) => {
               <span>to</span>
               <span>{localPreferences.budget[1]} TND</span>
             </div>
-            <div className="relative h-6">
-              <input
-                type="range"
-                min="0"
-                max="5000"
-                step="100"
-                value={localPreferences.budget[0]}
-                onChange={(e) => handleBudgetChange(0, e.target.value)}
-                className="absolute w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer slider"
-                style={{
-                  background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${(localPreferences.budget[0] / 5000) * 100}%, hsl(var(--secondary)) ${(localPreferences.budget[0] / 5000) * 100}%, hsl(var(--secondary)) 100%)`
-                }}
-              />
-              <input
-                type="range"
-                min="0"
-                max="5000"
-                step="100"
-                value={localPreferences.budget[1]}
-                onChange={(e) => handleBudgetChange(1, e.target.value)}
-                className="absolute w-full h-2 bg-transparent rounded-lg appearance-none cursor-pointer slider"
-              />
-            </div>
+            <Slider
+              value={localPreferences.budget}
+              onValueChange={handleBudgetChange}
+              min={0}
+              max={5000}
+              step={100}
+              className="w-full"
+            />
           </div>
         </div>
 

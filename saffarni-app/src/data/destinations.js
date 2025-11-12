@@ -3,7 +3,7 @@ export const destinations = [
     id: 'sidi-bou-said-carthage',
     title: 'Sidi Bou Said & Carthage',
     location: 'Tunis, Tunisia',
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop',
+    image: 'https://lp-cms-production.imgix.net/2024-07/GettyRF498116298.jpg?auto=format,compress&q=72&fit=crop',
     rating: 4.9,
     reviews: 542,
     description: 'Discover the blue and white streets of Sidi Bou Said and explore the ancient ruins of Carthage.',
