@@ -125,8 +125,11 @@ const HomePage = () => {
           {/* Personalized Recommendations */}
           <Card className="p-8 text-center bg-white rounded-3xl shadow-lg hover:shadow-xl transition-shadow relative z-10">
             <div className="flex justify-center mb-6">
-              <div className="w-24 h-24 flex items-center justify-center">
-                {/* illustration */}
+              <div className="w-30 h-30 flex items-center justify-center">
+                <img
+                  src="/src/assets/personalized-reccomendations.png"
+                  alt="reccomendation-illustration"
+                />
               </div>
             </div>
             <h3 className="text-xl font-bold mb-4" style={{ color: "#255194" }}>
@@ -143,8 +146,11 @@ const HomePage = () => {
           <Card className="p-8 text-center bg-white rounded-3xl shadow-lg hover:shadow-xl transition-shadow relative">
             <div className="relative z-10">
               <div className="flex justify-center mb-6">
-                <div className="w-24 h-24 flex items-center justify-center">
-                  {/* illustration */}
+                <div className="w-30 h-30 flex items-center justify-center">
+                  <img
+                    src="/src/assets/travel-illustration.svg"
+                    alt="smart-trip-generation-illustration"
+                  />
                 </div>
               </div>
               <h3
@@ -165,7 +171,7 @@ const HomePage = () => {
             <div className="relative z-10">
               <div className="flex justify-center mb-6">
                 <div className="w-24 h-24 flex items-center justify-center">
-                  {/* illustration */}
+                  <img src="/src/assets/booking-illustrations.svg" alt="booking-illustrations" />
                 </div>
               </div>
               <h3
