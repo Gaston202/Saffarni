@@ -1,4 +1,4 @@
-import heroImg from "../assets/heroimg.png";
+import heroImg from "../assets/heroimgg.svg";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 
