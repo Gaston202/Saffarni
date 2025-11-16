@@ -63,7 +63,7 @@ const RecommendationPage = () => {
   const [selectedDestination, setSelectedDestination] = useState(null);
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-blue-50 via-orange-50 to-blue-50">
       <div className="max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr_400px] gap-4 sm:gap-6 lg:gap-8">
         <PreferencesSidebar
           preferences={preferences}
