@@ -7,6 +7,8 @@ import TripCustomizationPage from "./Routes/TripCustomizationPage";
 import BookingsPage from "./Routes/BookingsPage";
 import HotelsPage from "./Routes/HotelsPage";
 import Navbar from "./components/Navbar";
+import Experiences from "./Routes/Experience";
+import Profile from "./Routes/Profile";
 import "./App.css";
 
 function App() {
@@ -24,6 +26,9 @@ function App() {
         />
         <Route path="/bookings" element={<BookingsPage />} />
         <Route path="/hotels" element={<HotelsPage />} />
+        <Route path="/experiences" element={<Experiences />} />
+        <Route path="/profile" element={<Profile />} />
+
       </Routes>
     </Router>
   );

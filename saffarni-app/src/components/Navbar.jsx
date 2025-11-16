@@ -33,6 +33,9 @@ const Navbar = () => {
             <Button variant="link" className="text-black" asChild>
               <Link to="/hotels">Hotels</Link>
             </Button>
+            <Button variant="link" className="text-black" asChild>
+              <Link to="/Experiences">Activities</Link>
+            </Button>
           </div>
           <div className="hidden items-center gap-4 lg:flex">
             <Button variant="link" className="text-black" asChild>
