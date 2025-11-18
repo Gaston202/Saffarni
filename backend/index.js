@@ -2,7 +2,7 @@ const express = require("express");
 const connectDb = require("./Configuration/connectDB");
 const app = express();
 const cors = require("cors");
-
+const HotelRoute = require("./Routes/HotelRoute");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -15,4 +15,7 @@ app.listen(port, (error)=>{
 })
 app.use(cors());
 app.use(express.json());
+app.use("/api", HotelRoute);
+
+
 
