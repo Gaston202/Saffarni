@@ -20,7 +20,7 @@ const userRoute = require("./Routes/UserRoute"); // ADD USER ROUTE
 connectDb();
 
 // Use routes
-app.use("/api/hotels", HotelRoute);  // hotel routes
+app.use("/api", HotelRoute);  // hotel routes
 app.use("/api", userRoute);          // user routes (signin, users, etc.)
 
 // Start server
