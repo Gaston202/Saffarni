@@ -1,21 +1,34 @@
 const express = require("express");
 const connectDb = require("./Configuration/connectDB");
-const app = express();
 const cors = require("cors");
-const HotelRoute = require("./Routes/HotelRoute");
 const dotenv = require("dotenv");
+
+// Load environment variables
 dotenv.config();
 
+const app = express();
 
-const port = process.env.PORT || 6005;
-connectDb();
-app.listen(port, (error)=>{
-    if(error){console.log("Server Failed")}
-    else{ console.log(`Server Started on port ${port}`)}
-})
+// Middlewares
 app.use(cors());
 app.use(express.json());
-app.use("/api", HotelRoute);
 
+// Routes
+const HotelRoute = require("./Routes/HotelRoute");
+const userRoute = require("./Routes/UserRoute"); // ADD USER ROUTE
 
+// Database connection
+connectDb();
 
+// Use routes
+app.use("/api/hotels", HotelRoute);  // hotel routes
+app.use("/api", userRoute);          // user routes (signin, users, etc.)
+
+// Start server
+const port = process.env.PORT || 6005;
+app.listen(port, (error) => {
+  if (error) {
+    console.log("Server Failed");
+  } else {
+    console.log(`Server Started on port ${port}`);
+  }
+});
