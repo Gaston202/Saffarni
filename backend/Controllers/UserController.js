@@ -44,9 +44,9 @@ const postUser = async (req, res) => {
   try {
     const { userName, email, age, password } = req.body;
 
-    // Check for missing fields
-    if (!userName || !email || !age || !password) {
-      return res.status(400).json({ msg: "Please fill all fields" });
+    // Check for required fields (age is optional)
+    if (!userName || !email || !password) {
+      return res.status(400).json({ msg: "Please fill required fields (userName, email, password)" });
     }
 
     // Check if user already exists
@@ -61,7 +61,8 @@ const postUser = async (req, res) => {
     const newUser = await User.create({
       userName,
       email,
-      age,
+      // only include age if provided
+      ...(age ? { age } : {}),
       password: hashedPassword,
     });
 

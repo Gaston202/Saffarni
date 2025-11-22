@@ -1,5 +1,4 @@
 import React from "react";
-import Login from "./Login";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +13,13 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
 
 function SignUp() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const {
     register,
@@ -25,9 +28,33 @@ function SignUp() {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
-    alert(`Welcome to Saffarni, ${data.username}!`);
+  // ▶ REGISTER USER (fixed version: no unused vars)
+  const onSubmit = async (data) => {
+    try {
+      // create account
+      await axios.post("http://localhost:6005/api/users", {
+        userName: data.username,
+        email: data.email,
+        password: data.password,
+        age: data.age || null,
+      });
+
+      // auto-login: call signin and populate auth context
+      const signin = await axios.post("http://localhost:6005/api/signin", {
+        email: data.email,
+        password: data.password,
+      });
+
+      // call login from context (persists user+token)
+      login(signin.data.user, signin.data.token);
+
+      alert("Account created and logged in!");
+      navigate("/");
+
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.msg || "Registration failed");
+    }
   };
 
   return (
@@ -39,12 +66,15 @@ function SignUp() {
               <CardTitle className="text-2xl text-[#e96642] font-semibold">
                 Create Your Saffarni Account
               </CardTitle>
-              {/* ✅ JSX comment syntax (no // allowed inside JSX) */}
-              <CardDescription>Let’s plan your next adventure 🌴</CardDescription>
+              <CardDescription>
+                Let’s plan your next adventure 🌴
+              </CardDescription>
             </CardHeader>
 
             <form onSubmit={handleSubmit(onSubmit)}>
               <CardContent className="grid gap-5">
+
+                {/* USERNAME */}
                 <div className="grid gap-2">
                   <Label htmlFor="username">Username</Label>
                   <Input
@@ -55,17 +85,22 @@ function SignUp() {
                     })}
                   />
                   {errors.username && (
-                    <p className="text-red-500 text-sm">
-                      {errors.username.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.username.message}</p>
                   )}
                 </div>
 
-                <div className="grid w-full max-w-sm items-center gap-3">
-                  <Label htmlFor="picture"> Profile Picture</Label>
-                  <Input id="picture" type="file"  />
+                {/* AGE (optional) */}
+                <div className="grid gap-2">
+                  <Label htmlFor="age">Age (optional)</Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    placeholder="Enter your age"
+                    {...register("age")}
+                  />
                 </div>
 
+                {/* EMAIL */}
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -75,12 +110,11 @@ function SignUp() {
                     {...register("email", { required: "Email is required" })}
                   />
                   {errors.email && (
-                    <p className="text-red-500 text-sm">
-                      {errors.email.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.email.message}</p>
                   )}
                 </div>
 
+                {/* PASSWORD */}
                 <div className="grid gap-2">
                   <Label htmlFor="password">Password</Label>
                   <Input
@@ -91,17 +125,16 @@ function SignUp() {
                       required: "Password is required",
                       minLength: {
                         value: 6,
-                        message: "Password must be at least 6 characters long",
+                        message: "Password must be at least 6 characters",
                       },
                     })}
                   />
                   {errors.password && (
-                    <p className="text-red-500 text-sm">
-                      {errors.password.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.password.message}</p>
                   )}
                 </div>
 
+                {/* CONFIRM PASSWORD */}
                 <div className="grid gap-2">
                   <Label htmlFor="confirm">Confirm Password</Label>
                   <Input
@@ -116,13 +149,12 @@ function SignUp() {
                     })}
                   />
                   {errors.confirm && (
-                    <p className="text-red-500 text-sm">
-                      {errors.confirm.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.confirm.message}</p>
                   )}
                 </div>
+
               </CardContent>
-              <br />
+
               <CardFooter className="flex flex-col items-center gap-3">
                 <Button
                   type="submit"

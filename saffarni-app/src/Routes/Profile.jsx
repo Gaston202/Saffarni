@@ -1,26 +1,43 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AuthContext } from "@/context/AuthContext";
+import axios from "axios";
 
 export default function Profile() {
-  // Everything is empty by default
-  const user = {
-    name: "",
-    email: "",
-    photo: "",
-    joined: "",
-    trips: [],
-    destinations: "",
-    budgetAvg: "",
-    preferences: {
-      style: [],
-      budget: "",
-      language: "",
-      theme: "",
-    },
+  const { user, token, logout, refreshUser } = useContext(AuthContext);
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    // if we have user in context, try to refresh from server
+    const load = async () => {
+      if (user) {
+        const fresh = await refreshUser();
+        setProfile(fresh || user);
+      } else {
+        // try to read localStorage fallback
+        const stored = localStorage.getItem("user");
+        if (stored) setProfile(JSON.parse(stored));
+      }
+    };
+    load();
+  }, [user, token]);
+
+  const trips = profile?.trips || [];
+
+  // helper to log out
+  const handleLogout = () => {
+    logout();
   };
 
-  const trips = []; // No default trips
+  const displayUser = profile || {
+    userName: "",
+    email: "",
+    createdAt: "",
+    photo: "",
+    trips: [],
+    age: null,
+  };
 
   return (
     <div className="min-h-screen bg-[#fffaf7] py-10 px-6 md:px-16">
@@ -37,21 +54,23 @@ export default function Profile() {
         <Card className="md:col-span-1 shadow-md border border-gray-100 rounded-2xl">
           <CardHeader className="flex flex-col items-center">
             <img
-              src={user.photo || "https://via.placeholder.com/150"}
+              src={displayUser.photo || "https://via.placeholder.com/150"}
               alt="User"
               className="w-28 h-28 rounded-full mb-4 border-4 border-[#ff6b3d]"
             />
 
             <CardTitle className="text-xl font-semibold text-[#1f3a63]">
-              {user.name || "Name not provided"}
+              {displayUser.userName || "Name not provided"}
             </CardTitle>
 
             <p className="text-gray-500 text-sm">
-              {user.email || "Email not provided"}
+              {displayUser.email || "Email not provided"}
             </p>
 
             <p className="text-sm mt-2 text-gray-600">
-              {user.joined ? `Member since ${user.joined}` : "Join date not provided"}
+              {displayUser.createdAt
+                ? `Member since ${new Date(displayUser.createdAt).toLocaleDateString()}`
+                : "Join date not provided"}
             </p>
           </CardHeader>
 
@@ -59,7 +78,11 @@ export default function Profile() {
             <Button className="bg-[#ff6b3d] hover:bg-[#ff8059] text-white w-full mb-3">
               Edit Profile
             </Button>
-            <Button variant="outline" className="w-full text-[#1f3a63] border-gray-300">
+            <Button
+              variant="outline"
+              className="w-full text-[#1f3a63] border-gray-300"
+              onClick={handleLogout}
+            >
               Log Out
             </Button>
           </CardContent>

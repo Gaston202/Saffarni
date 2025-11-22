@@ -9,6 +9,7 @@ import HotelsPage from "./Routes/HotelsPage";
 import Navbar from "./components/Navbar";
 import Experiences from "./Routes/Experience";
 import Profile from "./Routes/Profile";
+
 import "./App.css";
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
 
       </Routes>
     </Router>
+   
   );
 }
 
