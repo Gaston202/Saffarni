@@ -1,6 +1,5 @@
 const Hotel = require('../Models/Hotel');
 
-// Get all hotels
 const getHotels = async (req, res) => {
     const hotels= await Hotel.find();
     try {
@@ -14,24 +13,20 @@ const getHotels = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
-//Post a new hotel
-const postHotel = async (req, res) => {
-    const Hotel = req.body;
+const getHotelbyId = async (req, res) => {
+    const { id } = req.params;
     try {
-        const foundHotel = await Hotel.findOne({ name: Hotel.name });
-        if (foundHotel) {
-            return res.status(409).json({ message: 'Hotel already exists' });
+        const hotel = await Hotel.findById(id);
+        if (hotel) {
+            res.status(200).json(hotel);
+        } else {
+            res.status(404).json({ message: 'Hotel not found' });
         }
-        else {
-            const newHotel = new Hotel(Hotel);
-            const savedHotel = await newHotel.save();
-            res.status(201).json(savedHotel);
-         }
-        
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
+    
 
-module.exports = {getHotels, postHotel};
+
+module.exports = {getHotels, getHotelbyId};

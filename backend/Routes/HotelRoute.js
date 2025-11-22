@@ -1,6 +1,7 @@
 const express = require("express");
 const HotelRouter = express.Router();
-const { getHotels ,postHotel } = require("../Controllers/HotelController");
+const { getHotels ,getHotelbyId } = require("../Controllers/HotelController");
 HotelRouter.get("/hotels", getHotels);
-HotelRouter.post("/hotels", postHotel);
+HotelRouter.get("/hotels/:id", getHotelbyId);
+
 module.exports = HotelRouter;
