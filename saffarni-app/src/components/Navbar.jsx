@@ -1,19 +1,28 @@
-"use client";
-
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import SaffarniLogo from "../assets/SaffarniLogo.png";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const navLinks = [
+    { name: "Destinations", path: "/destinations" },
+    { name: "Hotels", path: "/hotels" },
+    { name: "Activities", path: "/experiences" },
+  ];
+
   return (
     <section
       className="py-3 sticky top-0 z-50 backdrop-blur-sm shadow-sm"
       style={{ backgroundColor: "#FFF1DA" }}
     >
-      <div className="container">
-        <nav className="flex items-center justify-around lg:justify-between">
-          <Link to="/">
+      <div className="container mx-auto px-6">
+        <nav className="flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
             <img
               src={SaffarniLogo}
               className="h-16 w-auto"
@@ -21,6 +30,7 @@ const Navbar = () => {
             />
           </Link>
 
+          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
@@ -33,12 +43,21 @@ const Navbar = () => {
               </Link>
             ))}
           </div>
-          <div className="hidden items-center gap-4 lg:flex">
-            <Button variant="link" className="text-black" asChild>
+
+          {/* Desktop Auth Buttons */}
+          <div className="hidden lg:flex items-center gap-4">
+            <Button
+              variant="ghost"
+              className="text-gray-700 hover:text-[#DF6951] hover:bg-transparent font-medium"
+              asChild
+            >
               <Link to="/login">Sign in</Link>
             </Button>
-            <Button variant="link" className="text-[#DF6951]" asChild>
-              <Link to="/signup">Start for free</Link>
+            <Button
+              className="bg-[#DF6951] hover:bg-[#c85a48] text-white font-medium px-6 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+              asChild
+            >
+              <Link to="/signup">Get Started</Link>
             </Button>
           </div>
 
