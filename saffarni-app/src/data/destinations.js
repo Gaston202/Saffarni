@@ -112,7 +112,7 @@ export const destinations = [
     rating: 4.9,
     reviews: 634,
     description: 'Relax on pristine beaches, explore ancient temples, and enjoy tropical island vibes.',
-    price: 1100,
+    price: 3.100,
     currency: 'TND',
     duration: 6,
     travelStyles: ['Relax', 'Beach', 'Culture'],
