@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
+import { Calendar, Wallet, Home, MapPin } from 'lucide-react';
 
 const PreferencesSidebar = ({ preferences, setPreferences }) => {
   const [localPreferences, setLocalPreferences] = useState(preferences);
@@ -68,7 +69,7 @@ const PreferencesSidebar = ({ preferences, setPreferences }) => {
       <CardContent className="space-y-6">
         <div className="space-y-3">
           <Label className="flex items-center gap-2">
-            <span>📅</span>
+            <Calendar className="w-4 h-4" />
             <span>Duration (days)</span>
           </Label>
           <div className="flex items-center gap-2">
@@ -94,7 +95,7 @@ const PreferencesSidebar = ({ preferences, setPreferences }) => {
 
         <div className="space-y-3">
           <Label className="flex items-center gap-2">
-            <span>💰</span>
+            <Wallet className="w-4 h-4" />
             <span>Budget Range</span>
           </Label>
           <div className="space-y-2">
@@ -109,14 +110,14 @@ const PreferencesSidebar = ({ preferences, setPreferences }) => {
               min={0}
               max={5000}
               step={100}
-              className="w-full"
+              className="w-full [&_[role=slider]]:border-[#DF6951] [&>span>span]:bg-[#DF6951]"
             />
           </div>
         </div>
 
         <div className="space-y-3">
           <Label className="flex items-center gap-2">
-            <span>🏠</span>
+            <Home className="w-4 h-4" />
             <span>Travel Style</span>
           </Label>
           <div className="flex flex-wrap gap-2">
@@ -128,7 +129,7 @@ const PreferencesSidebar = ({ preferences, setPreferences }) => {
                 onClick={() => handleTravelStyleToggle(style)}
                 className={cn(
                   "rounded-full",
-                  localPreferences.travelStyles.includes(style) && "bg-orange-500 hover:bg-orange-600"
+                  localPreferences.travelStyles.includes(style) && "bg-[#DF6951] text-white hover:bg-[#c85a48]"
                 )}
               >
                 {style}
@@ -139,7 +140,7 @@ const PreferencesSidebar = ({ preferences, setPreferences }) => {
 
         <div className="space-y-3">
           <Label className="flex items-center gap-2">
-            <span>📍</span>
+            <MapPin className="w-4 h-4" />
             <span>Preferences</span>
           </Label>
           <div className="flex flex-wrap gap-2">
@@ -151,7 +152,7 @@ const PreferencesSidebar = ({ preferences, setPreferences }) => {
                 onClick={() => handlePreferenceToggle(pref)}
                 className={cn(
                   "rounded-full",
-                  localPreferences.selectedPreferences.includes(pref) && "bg-orange-500 hover:bg-orange-600"
+                  localPreferences.selectedPreferences.includes(pref) && "bg-[#DF6951] text-white hover:bg-[#c85a48]"
                 )}
               >
                 {pref}
@@ -161,7 +162,7 @@ const PreferencesSidebar = ({ preferences, setPreferences }) => {
         </div>
 
         <Button 
-          className="w-full bg-teal-500 hover:bg-teal-600" 
+          className="w-full bg-[#DF6951] text-white hover:bg-[#c85a48]" 
           onClick={handleApplyPreferences}
         >
           Adjust Preferences

@@ -16,7 +16,8 @@ app.use(express.json());
 
 // Routes
 const HotelRoute = require("./Routes/HotelRoute");
-const userRoute = require("./Routes/UserRoute"); // ADD USER ROUTE
+const userRoute = require("./Routes/UserRoute");
+const DestinationRoute = require("./Routes/DestinationRoute");
 
 // Database connection
 connectDb();
@@ -24,6 +25,7 @@ connectDb();
 // Use routes
 app.use("/api", HotelRoute);  // hotel routes
 app.use("/api", userRoute);          // user routes (signin, users, etc.)
+app.use("/api/destinations", DestinationRoute);  // destination routes
 
 // Start server
 const port = process.env.PORT || 6005;
