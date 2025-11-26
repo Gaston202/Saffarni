@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, X, Utensils, Building2, MapPin, Star, Loader2 } from "lucide-react";
+import { ArrowLeft, X, Utensils, Building2, MapPin, Star, Loader2, Wifi, Coffee, ParkingCircle, Waves, Dumbbell } from "lucide-react";
 
 const TripCustomizationPage = () => {
   const { destinationId } = useParams();
@@ -82,6 +82,16 @@ const TripCustomizationPage = () => {
     selectedItems.restaurants.length +
     selectedItems.hotels.length +
     selectedItems.places.length;
+
+  const amenityIcons = {
+    Wifi: <Wifi className="w-4 h-4" />,
+    Pool: <Waves className="w-4 h-4" />,
+    Restaurant: <Utensils className="w-4 h-4" />,
+    Spa: <Coffee className="w-4 h-4" />,
+    Parking: <ParkingCircle className="w-4 h-4" />,
+    Gym: <Dumbbell className="w-4 h-4" />,
+    Coffee: <Coffee className="w-4 h-4" />,
+  };
 
   if (loading) {
     return (
@@ -174,6 +184,20 @@ const TripCustomizationPage = () => {
               </span>
             )}
           </div>
+          {category === "hotels" && item.amenities && item.amenities.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-2">
+              {item.amenities.slice(0, 4).map((amenity) => (
+                <div
+                  key={amenity}
+                  className="flex items-center gap-1 px-2 py-1 bg-blue-50 rounded-full text-xs"
+                  style={{ color: "#255194" }}
+                >
+                  {amenityIcons[amenity] || <MapPin className="w-3 h-3" />}
+                  <span>{amenity}</span>
+                </div>
+              ))}
+            </div>
+          )}
           <p className="text-sm text-muted-foreground mb-2">
             {item.description}
           </p>
