@@ -1,14 +1,13 @@
 const express = require('express');
-const router = express.Router();
+const Destinationroute = express.Router();
 const {
   getDestinations,
   getDestinationById,
   getDestinationDetails,
 } = require('../Controllers/DestinationController');
 
-router.get('/', getDestinations);
-router.get('/:destinationId/details', getDestinationDetails);
-router.get('/:id', getDestinationById);
+Destinationroute.get('/destinations', getDestinations);
+Destinationroute.get('/destinations/:destinationId/details', getDestinationDetails);
+Destinationroute.get('/destinations/:id', getDestinationById);
 
-module.exports = router;
-
+module.exports = Destinationroute;

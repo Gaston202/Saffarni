@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { activityService } from "../services/activityService";
 
 import {
   Card,
@@ -21,7 +21,11 @@ import {
 // Remove experiences import
 // import { experiences } from "../data/experiencesData";
 
-import { defaultFilters, experienceTypes, cities } from "../data/experiencesData";
+import {
+  defaultFilters,
+  experienceTypes,
+  cities,
+} from "../data/experiencesData";
 
 export default function Experiences() {
   const [filters, setFilters] = useState({ ...defaultFilters, city: "All" });
@@ -31,8 +35,8 @@ export default function Experiences() {
   // Fetch all activities from backend
   const fetchActivities = async () => {
     try {
-      const res = await axios.get("http://localhost:6005/api/activities");
-      setExperiences(res.data);
+      const data = await activityService.getAll();
+      setExperiences(data);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching activities:", err);
@@ -66,17 +70,21 @@ export default function Experiences() {
     <div className="min-h-screen bg-[#fffaf7]">
       <section className="text-center py-16 bg-gradient-to-b from-[#fff6f2] to-[#fffaf7]">
         <h1 className="text-4xl font-bold text-[#1f3a63]">
-          Discover <span className="text-[#ff6b3d]">Experiences</span> That Inspire You
+          Discover <span className="text-[#ff6b3d]">Experiences</span> That
+          Inspire You
         </h1>
         <p className="text-gray-600 mt-3 max-w-2xl mx-auto">
-          Handpicked adventures, local secrets, and AI-powered suggestions tailored to your style.
+          Handpicked adventures, local secrets, and AI-powered suggestions
+          tailored to your style.
         </p>
       </section>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 px-6 pb-20">
         {/* Filters */}
         <aside className="bg-white shadow-md rounded-2xl p-6 border border-gray-100 md:col-span-1">
-          <h2 className="text-lg font-semibold text-[#1f3a63] mb-4">Filter by</h2>
+          <h2 className="text-lg font-semibold text-[#1f3a63] mb-4">
+            Filter by
+          </h2>
 
           {/* Type */}
           <div className="mb-6">
@@ -87,7 +95,9 @@ export default function Experiences() {
                   key={t}
                   variant={filters.type === t ? "default" : "outline"}
                   onClick={() => setFilters({ ...filters, type: t })}
-                  className={filters.type === t ? "bg-[#ff6b3d] text-white" : ""}
+                  className={
+                    filters.type === t ? "bg-[#ff6b3d] text-white" : ""
+                  }
                 >
                   {t}
                 </Button>
@@ -125,18 +135,25 @@ export default function Experiences() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredExperiences.map((exp) => (
-              <Card key={exp._id} className="overflow-hidden rounded-2xl shadow-sm hover:shadow-lg transition-all border border-gray-100">
+              <Card
+                key={exp._id}
+                className="overflow-hidden rounded-2xl shadow-sm hover:shadow-lg transition-all border border-gray-100"
+              >
                 <img src={exp.imageUrl} className="h-40 w-full object-cover" />
 
                 <CardHeader>
-                  <CardTitle className="text-lg text-[#1f3a63]">{exp.title}</CardTitle>
+                  <CardTitle className="text-lg text-[#1f3a63]">
+                    {exp.title}
+                  </CardTitle>
                 </CardHeader>
 
                 <CardContent>
                   <p className="text-sm text-gray-600">{exp.city}</p>
                   <p className="text-sm mt-1">
-                    <span className="text-[#ff6b3d] font-medium">{exp.category}</span> •{" "}
-                    {exp.duration}
+                    <span className="text-[#ff6b3d] font-medium">
+                      {exp.category}
+                    </span>{" "}
+                    • {exp.duration}
                   </p>
                   <p className="text-sm mt-1 font-medium">{exp.price} TND</p>
                 </CardContent>

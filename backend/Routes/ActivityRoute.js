@@ -1,4 +1,4 @@
-const router = require("express").Router();
+const Activityrouter = require("express").Router();
 const {
   createActivity,
   getActivities,
@@ -8,11 +8,10 @@ const {
 } = require("../controllers/activityController");
 
 // CRUD
-router.post("/", createActivity);
-router.get("/", getActivities);
-router.get("/destination/:id", getActivitiesByDestination);
-router.put("/:id", updateActivity);
-router.delete("/:id", deleteActivity);
-
-module.exports = router;
+Activityrouter.post("/activities", createActivity);
+Activityrouter.get("/activities", getActivities);
+Activityrouter.get("/activities/destination/:id", getActivitiesByDestination);
+Activityrouter.put("/activities/:id", updateActivity);
+Activityrouter.delete("/activities/:id", deleteActivity);
+module.exports = Activityrouter;
  
