@@ -4,9 +4,12 @@ import { useState } from "react";
 import SaffarniLogo from "../assets/SaffarniLogo.png";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useContext(AuthContext);
 
   const navLinks = [
     { name: "Destinations", path: "/destinations" },
@@ -46,19 +49,41 @@ const Navbar = () => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden lg:flex items-center gap-4">
-            <Button
-              variant="ghost"
-              className="text-gray-700 hover:text-[#DF6951] hover:bg-transparent font-medium"
-              asChild
-            >
-              <Link to="/login">Sign in</Link>
-            </Button>
-            <Button
-              className="bg-[#DF6951] hover:bg-[#c85a48] text-white font-medium px-6 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
-              asChild
-            >
-              <Link to="/signup">Get Started</Link>
-            </Button>
+            {!user ? (
+              <>
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:text-[#DF6951] hover:bg-transparent font-medium"
+                  asChild
+                >
+                  <Link to="/login">Sign in</Link>
+                </Button>
+
+                <Button
+                  className="bg-[#DF6951] hover:bg-[#c85a48] text-white font-medium px-6 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+                  asChild
+                >
+                  <Link to="/signup">Get Started</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  className="bg-[#DF6951] hover:bg-[#c85a48] text-white font-medium px-6 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+                  asChild
+                >
+                  <Link to="/profile">Profile</Link>
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  className="text-gray-700 hover:text-[#DF6951] hover:bg-transparent font-medium"
+                  onClick={logout}
+                >
+                  Logout
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -98,24 +123,52 @@ const Navbar = () => {
                 </div>
 
                 {/* Mobile Auth Buttons */}
+                {/* Mobile Auth Buttons */}
                 <div className="flex flex-col gap-3 mt-6">
-                  <Button
-                    variant="outline"
-                    className="w-full border-[#DF6951] text-[#DF6951] hover:bg-[#DF6951] hover:text-white font-medium"
-                    asChild
-                  >
-                    <Link to="/login" onClick={() => setIsOpen(false)}>
-                      Sign in
-                    </Link>
-                  </Button>
-                  <Button
-                    className="w-full bg-[#DF6951] hover:bg-[#c85a48] text-white font-medium"
-                    asChild
-                  >
-                    <Link to="/signup" onClick={() => setIsOpen(false)}>
-                      Get Started
-                    </Link>
-                  </Button>
+                  {!user ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        className="w-full border-[#DF6951] text-[#DF6951] hover:bg-[#DF6951] hover:text-white font-medium"
+                        asChild
+                      >
+                        <Link to="/login" onClick={() => setIsOpen(false)}>
+                          Sign in
+                        </Link>
+                      </Button>
+
+                      <Button
+                        className="w-full bg-[#DF6951] hover:bg-[#c85a48] text-white font-medium"
+                        asChild
+                      >
+                        <Link to="/signup" onClick={() => setIsOpen(false)}>
+                          Get Started
+                        </Link>
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        className="w-full bg-[#DF6951] hover:bg-[#c85a48] text-white font-medium"
+                        asChild
+                      >
+                        <Link to="/profile" onClick={() => setIsOpen(false)}>
+                          Profile
+                        </Link>
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        className="w-full border-[#DF6951] text-[#DF6951] hover:bg-[#DF6951] hover:text-white font-medium"
+                        onClick={() => {
+                          logout();
+                          setIsOpen(false);
+                        }}
+                      >
+                        Logout
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </SheetContent>
