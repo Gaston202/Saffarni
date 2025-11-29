@@ -6,7 +6,12 @@ export const hotelService = {
   // Get all hotels
   getAllHotels: async () => {
     try {
-      const response = await axios.get(`${API_URL}/hotels`);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/hotels`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching hotels:', error);
@@ -17,7 +22,12 @@ export const hotelService = {
   // Get hotel by ID
   getHotelById: async (id) => {
     try {
-      const response = await axios.get(`${API_URL}/hotels/${id}`);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/hotels/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching hotel:', error);

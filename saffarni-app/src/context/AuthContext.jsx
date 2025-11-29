@@ -27,6 +27,7 @@ export const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // on mount, restore from localStorage
   useEffect(() => {
@@ -34,6 +35,7 @@ export function AuthProvider({ children }) {
     const storedUser = localStorage.getItem("user");
     if (storedToken) setToken(storedToken);
     if (storedUser) setUser(JSON.parse(storedUser));
+    setLoading(false);
   }, []);
 
   // watch token expiry and auto-logout when it expires
@@ -106,9 +108,12 @@ export function AuthProvider({ children }) {
   const refreshUser = async () => {
     try {
       if (!user || !user._id || !token) return null;
-      const res = await axios.get(`http://localhost:6005/api/users/${user._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        `http://localhost:6005/api/users/${user._id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (res.data?.user) {
         setUser(res.data.user);
         return res.data.user;
@@ -120,7 +125,9 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, refreshUser }}>
+    <AuthContext.Provider
+      value={{ user, token, login, logout, refreshUser, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );

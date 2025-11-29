@@ -9,6 +9,7 @@ import HotelsPage from "./Routes/HotelsPage";
 import Navbar from "./components/Navbar";
 import Experiences from "./Routes/Experience";
 import Profile from "./Routes/Profile";
+import PrivateRoute from "./Routes/PrivateRoute";
 
 import "./App.css";
 
@@ -26,13 +27,18 @@ function App() {
           element={<TripCustomizationPage />}
         />
         <Route path="/bookings" element={<BookingsPage />} />
-        <Route path="/hotels" element={<HotelsPage />} />
+        <Route
+          path="/hotels"
+          element={
+            <PrivateRoute>
+              <HotelsPage />
+            </PrivateRoute>
+          }
+        />
         <Route path="/experiences" element={<Experiences />} />
         <Route path="/profile" element={<Profile />} />
-
       </Routes>
     </Router>
-   
   );
 }
 

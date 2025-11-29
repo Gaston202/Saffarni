@@ -4,6 +4,7 @@ const {
   getDestinations,
   getDestinationById,
   getDestinationDetails,
+  
 } = require('../Controllers/DestinationController');
 
 Destinationroute.get('/destinations', getDestinations);

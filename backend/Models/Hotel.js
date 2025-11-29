@@ -12,7 +12,7 @@ const HotelSchema = new Schema(
         amenities: { type: [String], required: true },
         description: { type: String, required: true },
         availableRooms: { type: Number, required: true },
-        destinationId: { type: String, required: false }, // Link to destination
+        destinationId: { type: String, required: false },
     }
 );
 const Hotel = mongoose.model("Hotel", HotelSchema);
