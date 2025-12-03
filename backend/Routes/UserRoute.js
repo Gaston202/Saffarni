@@ -9,6 +9,7 @@ const {
   getOneUser,
   signIn,
 } = require("../Controllers/UserController");
+const { updateProfile, updatePreferences, addTrip } = require("../Controllers/UserController");
 
 const isAuth = require("../Middleware/isAuth");
 const isAutho = require("../Middleware/isAutho");
@@ -21,6 +22,15 @@ userRoute.get("/users/:id", isAuth, isAutho(["user", "admin"]), getOneUser);
 
 // REGISTER a new user
 userRoute.post("/users", postUser);
+
+// Update profile (current logged in user)
+userRoute.put("/users/updateProfile", isAuth, updateProfile);
+
+// Update preferences (current logged in user)
+userRoute.put("/users/updatePreferences", isAuth, updatePreferences);
+
+// Add trip to user's profile
+userRoute.post('/users/:id/trips', isAuth, addTrip);
 
 // UPDATE user (only admin allowed)
 userRoute.put("/users/:id", isAuth, isAutho(["admin"]), putUser);

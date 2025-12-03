@@ -13,7 +13,9 @@ exports.createActivity = async (req, res) => {
 // Get all activities
 exports.getActivities = async (req, res) => {
   try {
-    const activities = await Activity.find().populate("destinationId");
+    const activities = await Activity.find()
+      .populate("destinationId")
+      .select("title description price duration category imageUrl destinationId");
     res.status(200).json(activities);
   } catch (err) {
     res.status(500).json({ message: err.message });

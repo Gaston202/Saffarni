@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:6005/api";
 import { AuthContext } from "@/context/AuthContext";
 
 import { Button } from "@/components/ui/button";
@@ -41,7 +43,9 @@ const TRAVEL_FREQUENCY_OPTIONS = [
 ];
 
 export default function Profile() {
+  const navigate = useNavigate();
   const { user, token, logout, refreshUser } = useContext(AuthContext);
+  const isAuthenticated = user ? true : false;
 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -81,6 +85,13 @@ export default function Profile() {
     load();
   }, [user, token, refreshUser]);
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
+
   const handleLogout = () => logout();
 
   // ------- PHOTO UPLOAD -------
@@ -102,12 +113,14 @@ export default function Profile() {
 
         try {
           await axios.put(
-            "/api/users/updateProfile",
+            `${API_URL}/users/updateProfile`,
             { photo: base64Image },
             {
               headers: token ? { Authorization: `Bearer ${token}` } : {},
             }
           );
+            // refresh profile from backend to get normalized data
+            if (refreshUser) await refreshUser();
         } catch (err) {
           console.error("Error saving photo on backend:", err);
         }
@@ -156,7 +169,7 @@ export default function Profile() {
   const handleSaveProfile = async () => {
     try {
       const res = await axios.put(
-        "/api/users/updateProfile",
+        `${API_URL}/users/updateProfile`,
         {
           userName: profileForm.userName,
           email: profileForm.email,
@@ -166,12 +179,9 @@ export default function Profile() {
         }
       );
 
-      const updated = res.data || {};
-      setProfile((prev) => ({
-        ...(prev || {}),
-        ...updated,
-      }));
-
+      // refresh user from backend to keep context and UI in sync
+      const fresh = refreshUser ? await refreshUser() : null;
+      setProfile(fresh || res.data?.user || {});
       setIsProfileDialogOpen(false);
     } catch (err) {
       console.error("Error updating profile:", err);
@@ -191,20 +201,16 @@ export default function Profile() {
       };
 
       const res = await axios.put(
-        "/api/users/updatePreferences",
+        `${API_URL}/users/updatePreferences`,
         payload,
         {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
       );
 
-      const updatedPrefs = res.data?.preferences || payload;
-
-      setProfile((prev) => ({
-        ...(prev || {}),
-        preferences: updatedPrefs,
-      }));
-
+      // refresh user so preferences are reflected in context/profile
+      const fresh = refreshUser ? await refreshUser() : null;
+      setProfile((prev) => ({ ...(prev || {}), preferences: fresh?.preferences || res.data?.preferences || payload }));
       setIsPrefsDialogOpen(false);
     } catch (err) {
       console.error("Error updating preferences:", err);

@@ -96,8 +96,11 @@ const getUsers = async (req, res) => {
 const getOneUser = async (req, res) => {
   try {
     const id = req.params.id;
-
-    const foundUser = await User.findById(id, "-password");
+    // populate trips.activityId so frontend can display activity details
+    const foundUser = await User.findById(id, "-password").populate({
+      path: "trips.activityId",
+      select: "title imageUrl duration destinationId price category",
+    });
     if (!foundUser) {
       return res.status(404).json({ msg: "No user found with this ID" });
     }
@@ -105,6 +108,91 @@ const getOneUser = async (req, res) => {
     res.status(200).json({ user: foundUser });
   } catch (error) {
     res.status(500).json({ msg: "Error retrieving user" });
+  }
+};
+
+// UPDATE PROFILE (for logged in user)
+const updateProfile = async (req, res) => {
+  try {
+    const id = req.user?.id; // from isAuth middleware
+    if (!id) return res.status(401).json({ msg: "Unauthorized" });
+
+    const { userName, email, photo } = req.body;
+
+    const update = {};
+    if (userName) update.userName = userName;
+    if (email) update.email = email;
+    if (photo !== undefined) update.photo = photo;
+
+    const updated = await User.findByIdAndUpdate(id, update, {
+      new: true,
+      select: "-password",
+    });
+
+    res.status(200).json({ user: updated });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error updating profile" });
+  }
+};
+
+// UPDATE PREFERENCES (for logged in user)
+const updatePreferences = async (req, res) => {
+  try {
+    const id = req.user?.id;
+    if (!id) return res.status(401).json({ msg: "Unauthorized" });
+
+    const prefs = req.body;
+
+    const updated = await User.findByIdAndUpdate(
+      id,
+      { preferences: prefs },
+      { new: true, select: "-password" }
+    );
+
+    res.status(200).json({ preferences: updated.preferences });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error updating preferences" });
+  }
+};
+
+// ADD TRIP to user's profile
+const addTrip = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const authUserId = req.user?.id;
+
+    // allow only owner or admin
+    if (!authUserId || (authUserId !== userId && req.user.role !== "admin")) {
+      return res.status(403).json({ msg: "Forbidden" });
+    }
+
+    const { activityId } = req.body;
+    if (!activityId) return res.status(400).json({ msg: "activityId required" });
+
+    // fetch activity snapshot
+    const Activity = require("../Models/Activity");
+    const activity = await Activity.findById(activityId);
+    if (!activity) return res.status(404).json({ msg: "Activity not found" });
+
+    const tripEntry = {
+      activityId: activity._id,
+      title: activity.title,
+      image: activity.imageUrl,
+      duration: activity.duration,
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $push: { trips: tripEntry } },
+      { new: true, select: "-password" }
+    );
+
+    res.status(201).json({ user: updatedUser });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error adding trip" });
   }
 };
 
@@ -144,4 +232,7 @@ module.exports = {
   getOneUser,
   putUser,
   deleteUser,
+  updateProfile,
+  updatePreferences,
+  addTrip,
 };

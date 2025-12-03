@@ -12,7 +12,9 @@ const app = express();
 
 // Middlewares
 app.use(cors());
-app.use(express.json());
+// Increase JSON body limit to accept base64 images from frontend
+app.use(express.json({ limit: '8mb' }));
+app.use(express.urlencoded({ limit: '8mb', extended: true }));
 
 // Routes
 const HotelRoute = require("./Routes/HotelRoute");

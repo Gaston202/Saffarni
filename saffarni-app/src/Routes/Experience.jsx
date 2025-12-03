@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { activityService } from "../services/activityService";
+import { AuthContext } from "@/context/AuthContext";
+
 
 import {
   Card,
@@ -28,6 +31,10 @@ import {
 } from "../data/experiencesData";
 
 export default function Experiences() {
+  const navigate = useNavigate();
+  const authContext = useContext(AuthContext);
+  const isAuthenticated = authContext?.user ? true : false;
+
   const [filters, setFilters] = useState({ ...defaultFilters, city: "All" });
   const [experiences, setExperiences] = useState([]); // DATA FROM BACKEND
   const [loading, setLoading] = useState(true);
@@ -48,6 +55,13 @@ export default function Experiences() {
     fetchActivities();
   }, []);
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
+
   const addToTrip = (experience) => {
     const stored = JSON.parse(localStorage.getItem("tripPlan")) || [];
     const updated = [...stored, experience];
@@ -56,9 +70,10 @@ export default function Experiences() {
   };
 
   const filteredExperiences = experiences.filter((exp) => {
+    const city = exp.destinationId?.title || "";
     return (
       (filters.type === "All" || exp.category === filters.type) &&
-      (filters.city === "All" || exp.city === filters.city)
+      (filters.city === "All" || city === filters.city)
     );
   });
 
@@ -148,7 +163,7 @@ export default function Experiences() {
                 </CardHeader>
 
                 <CardContent>
-                  <p className="text-sm text-gray-600">{exp.city}</p>
+                  <p className="text-sm text-gray-600">{exp.destinationId?.title}</p>
                   <p className="text-sm mt-1">
                     <span className="text-[#ff6b3d] font-medium">
                       {exp.category}
