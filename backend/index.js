@@ -32,12 +32,18 @@ app.use("/api", ActivityRoute); // activity routes base path
 app.use("/api", DestinationRoute); // destination routes base path
 
 
-// Start server
+// Start server (only when not in Vercel serverless environment)
 const port = process.env.PORT || 6005;
-app.listen(port, (error) => {
-  if (error) {
-    console.log("Server Failed");
-  } else {
-    console.log(`Server Started on port ${port}`);
-  }
-});
+
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, (error) => {
+    if (error) {
+      console.log("Server Failed");
+    } else {
+      console.log(`Server Started on port ${port}`);
+    }
+  });
+}
+
+// Export for Vercel serverless
+module.exports = app;
