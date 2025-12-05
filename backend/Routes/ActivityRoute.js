@@ -5,7 +5,7 @@ const {
   getActivitiesByDestination,
   updateActivity,
   deleteActivity,
-} = require("../controllers/activityController");
+} = require("../Controllers/ActivityController");
 
 // CRUD
 Activityrouter.post("/activities", createActivity);
