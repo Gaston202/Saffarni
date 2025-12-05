@@ -1,6 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:6005/api";
+
 import {
   Card,
   CardContent,
@@ -31,7 +34,7 @@ function Login() {
   // 🔥 LOGIN FUNCTION (connects to backend)
   const onLogin = async (data) => {
     try {
-      const result = await axios.post("http://localhost:6005/api/signin", {
+      const result = await axios.post(`${API_URL}/signin`, {
         email: data.email,
         password: data.password,
       });
@@ -41,7 +44,6 @@ function Login() {
 
       alert("Logged in successfully!");
       navigate("/"); // redirect to homepage
-
     } catch (error) {
       console.error(error);
       alert(error.response?.data?.msg || "Login failed");
@@ -64,7 +66,6 @@ function Login() {
         {/* FORM START */}
         <form onSubmit={handleSubmit(onLogin)}>
           <CardContent className="grid gap-5">
-            
             {/* EMAIL */}
             <div className="grid gap-2">
               <Label htmlFor="email-login">Email</Label>
@@ -89,10 +90,11 @@ function Login() {
                 {...register("password", { required: "Password is required" })}
               />
               {errors.password && (
-                <p className="text-red-500 text-sm">{errors.password.message}</p>
+                <p className="text-red-500 text-sm">
+                  {errors.password.message}
+                </p>
               )}
             </div>
-
           </CardContent>
 
           <CardFooter className="flex flex-col items-center gap-3">
@@ -114,10 +116,8 @@ function Login() {
               </Button>
             </div>
           </CardFooter>
-
         </form>
         {/* FORM END */}
-
       </Card>
     </div>
   );

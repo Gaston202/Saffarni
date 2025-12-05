@@ -1,5 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:6005/api";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +17,6 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "@/context/AuthContext";
 
@@ -32,7 +35,7 @@ function SignUp() {
   const onSubmit = async (data) => {
     try {
       // create account
-      await axios.post("http://localhost:6005/api/users", {
+      await axios.post(`${API_URL}/users`, {
         userName: data.username,
         email: data.email,
         password: data.password,
@@ -40,7 +43,7 @@ function SignUp() {
       });
 
       // auto-login: call signin and populate auth context
-      const signin = await axios.post("http://localhost:6005/api/signin", {
+      const signin = await axios.post(`${API_URL}/signin`, {
         email: data.email,
         password: data.password,
       });
@@ -50,7 +53,6 @@ function SignUp() {
 
       alert("Account created and logged in!");
       navigate("/");
-
     } catch (error) {
       console.error(error);
       alert(error.response?.data?.msg || "Registration failed");
@@ -73,7 +75,6 @@ function SignUp() {
 
             <form onSubmit={handleSubmit(onSubmit)}>
               <CardContent className="grid gap-5">
-
                 {/* USERNAME */}
                 <div className="grid gap-2">
                   <Label htmlFor="username">Username</Label>
@@ -85,7 +86,9 @@ function SignUp() {
                     })}
                   />
                   {errors.username && (
-                    <p className="text-red-500 text-sm">{errors.username.message}</p>
+                    <p className="text-red-500 text-sm">
+                      {errors.username.message}
+                    </p>
                   )}
                 </div>
 
@@ -110,7 +113,9 @@ function SignUp() {
                     {...register("email", { required: "Email is required" })}
                   />
                   {errors.email && (
-                    <p className="text-red-500 text-sm">{errors.email.message}</p>
+                    <p className="text-red-500 text-sm">
+                      {errors.email.message}
+                    </p>
                   )}
                 </div>
 
@@ -130,7 +135,9 @@ function SignUp() {
                     })}
                   />
                   {errors.password && (
-                    <p className="text-red-500 text-sm">{errors.password.message}</p>
+                    <p className="text-red-500 text-sm">
+                      {errors.password.message}
+                    </p>
                   )}
                 </div>
 
@@ -144,15 +151,15 @@ function SignUp() {
                     {...register("confirm", {
                       required: "Please confirm your password",
                       validate: (value) =>
-                        value === watch("password") ||
-                        "Passwords do not match",
+                        value === watch("password") || "Passwords do not match",
                     })}
                   />
                   {errors.confirm && (
-                    <p className="text-red-500 text-sm">{errors.confirm.message}</p>
+                    <p className="text-red-500 text-sm">
+                      {errors.confirm.message}
+                    </p>
                   )}
                 </div>
-
               </CardContent>
 
               <CardFooter className="flex flex-col items-center gap-3">

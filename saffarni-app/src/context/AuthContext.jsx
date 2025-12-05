@@ -106,14 +106,12 @@ export function AuthProvider({ children }) {
 
   // helper to refresh user from API using stored token
   const refreshUser = async () => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:6005/api";
     try {
       if (!user || !user._id || !token) return null;
-      const res = await axios.get(
-        `http://localhost:6005/api/users/${user._id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await axios.get(`${API_URL}/users/${user._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.data?.user) {
         setUser(res.data.user);
         return res.data.user;
