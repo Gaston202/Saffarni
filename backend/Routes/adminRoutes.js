@@ -1,6 +1,6 @@
 const express = require("express");
 const isAuth = require("../Middleware/isAuth");
-const isAdmin = require("../Middleware/isAdmin");
+const isAutho = require("../Middleware/isAutho");
 
 const {
   getAllUsers,
@@ -21,8 +21,9 @@ const {
 
 const router = express.Router();
 
+// Auth + Admin authorization (CORRECT)
 router.use(isAuth);
-router.use(isAdmin);
+router.use(isAutho(["admin"]));
 
 // Users management
 router.get("/users", getAllUsers);

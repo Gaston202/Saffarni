@@ -3,9 +3,6 @@ const connectDb = require("./Configuration/connectDB");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
-
-
-
 // Load environment variables
 dotenv.config();
 
@@ -23,6 +20,7 @@ const userRoute = require("./Routes/UserRoute");
 const ActivityRoute = require("./Routes/ActivityRoute");
 const DestinationRoute = require("./Routes/DestinationRoute"); 
 const adminRoutes = require("./Routes/adminRoutes");
+const tripRoutes = require("./Routes/TripRoute");
 
 // Database connection
 connectDb();
@@ -33,6 +31,7 @@ app.use("/api", userRoute);   // user routes (signin, users, etc.)
 app.use("/api", ActivityRoute); // activity routes base path
 app.use("/api", DestinationRoute); // destination routes base path
 app.use("/api/admin", adminRoutes); // admin routes
+app.use("/api", tripRoutes); // trip routes (user-facing)
 
 // Start server (only when not in Vercel serverless environment)
 const port = process.env.PORT || 6005;
