@@ -24,10 +24,21 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<HomePage />} />
-        <Route path="/destinations" element={<RecommendationPage />} />
+        <Route
+          path="/destinations"
+          element={
+            <PrivateRoute>
+              <RecommendationPage />
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/customize/:destinationId"
-          element={<TripCustomizationPage />}
+          element={
+            <PrivateRoute>
+              <TripCustomizationPage />
+            </PrivateRoute>
+          }
         />
         <Route path="/bookings" element={<BookingsPage />} />
         <Route
