@@ -2,7 +2,7 @@ const Booking = require("../Models/Booking");
 const Restaurant = require("../Models/Restaurant");
 const Hotel = require("../Models/Hotel");
 
-// Create a new booking
+// ================= CREATE BOOKING =================
 const createBooking = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -23,23 +23,23 @@ const createBooking = async (req, res) => {
       specialRequests,
     } = req.body;
 
-    // Validate type
     if (!type || !["restaurant", "hotel"].includes(type)) {
-      return res.status(400).json({ msg: "Invalid booking type. Must be 'restaurant' or 'hotel'" });
+      return res.status(400).json({ msg: "Invalid booking type" });
     }
 
-    let bookingData = {
+    const bookingData = {
       user: userId,
       type,
+      numberOfGuests,
       specialRequests: specialRequests || "",
     };
 
+    // ===== RESTAURANT BOOKING =====
     if (type === "restaurant") {
       if (!restaurantId || !reservationDate || !reservationTime || !numberOfGuests) {
-        return res.status(400).json({ msg: "Missing required fields for restaurant booking" });
+        return res.status(400).json({ msg: "Missing restaurant booking fields" });
       }
 
-      // Verify restaurant exists
       const restaurant = await Restaurant.findById(restaurantId);
       if (!restaurant) {
         return res.status(404).json({ msg: "Restaurant not found" });
@@ -48,65 +48,50 @@ const createBooking = async (req, res) => {
       bookingData.restaurantId = restaurantId;
       bookingData.reservationDate = new Date(reservationDate);
       bookingData.reservationTime = reservationTime;
-      bookingData.numberOfGuests = numberOfGuests;
+      bookingData.totalPrice = 0;
+    }
 
-      // Set total price (you can calculate based on restaurant pricing if needed)
-      bookingData.totalPrice = 0; // Add pricing logic if needed
-    } else if (type === "hotel") {
+    // ===== HOTEL BOOKING =====
+    if (type === "hotel") {
       if (!hotelId || !checkInDate || !checkOutDate || !numberOfRooms) {
-        return res.status(400).json({ msg: "Missing required fields for hotel booking" });
+        return res.status(400).json({ msg: "Missing hotel booking fields" });
       }
 
-      // Verify hotel exists
       const hotel = await Hotel.findById(hotelId);
       if (!hotel) {
         return res.status(404).json({ msg: "Hotel not found" });
       }
 
-      // Validate dates
       const checkIn = new Date(checkInDate);
       const checkOut = new Date(checkOutDate);
-      
+
       if (checkOut <= checkIn) {
-        return res.status(400).json({ msg: "Check-out date must be after check-in date" });
-      }
-
-      if (checkIn < new Date()) {
-        return res.status(400).json({ msg: "Check-in date cannot be in the past" });
-      }
-
-      // Check room availability
-      if (hotel.availableRooms < numberOfRooms) {
-        return res.status(400).json({ msg: "Not enough rooms available" });
+        return res.status(400).json({ msg: "Check-out must be after check-in" });
       }
 
       bookingData.hotelId = hotelId;
       bookingData.checkInDate = checkIn;
       bookingData.checkOutDate = checkOut;
       bookingData.numberOfRooms = numberOfRooms;
-      bookingData.numberOfGuests = numberOfGuests || numberOfRooms * 2; // Default to 2 guests per room
 
-      // Calculate total price (nights * price per night * number of rooms)
       const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
       bookingData.totalPrice = nights * hotel.price * numberOfRooms;
     }
 
     const booking = await Booking.create(bookingData);
-    
-    // Populate references
-    await booking.populate([
-      { path: "restaurantId", select: "name image address" },
-      { path: "hotelId", select: "name image location price" },
-    ]);
 
-    res.status(201).json({ msg: "Booking created successfully", booking });
+    const populatedBooking = await Booking.findById(booking._id)
+      .populate("restaurantId", "name image address")
+      .populate("hotelId", "name image location price");
+
+    res.status(201).json(populatedBooking);
   } catch (error) {
     console.error("Create booking error:", error);
-    res.status(500).json({ msg: "Failed to create booking", error: error.message });
+    res.status(500).json({ msg: "Failed to create booking" });
   }
 };
 
-// Get all bookings for the authenticated user
+// ================= GET MY BOOKINGS =================
 const getUserBookings = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -121,18 +106,15 @@ const getUserBookings = async (req, res) => {
 
     res.status(200).json(bookings);
   } catch (error) {
-    console.error("Get user bookings error:", error);
+    console.error("Get bookings error:", error);
     res.status(500).json({ msg: "Failed to fetch bookings" });
   }
 };
 
-// Get a single booking by ID
+// ================= GET BOOKING BY ID =================
 const getBookingById = async (req, res) => {
   try {
-    const userId = req.user?.id;
-    const { id } = req.params;
-
-    const booking = await Booking.findById(id)
+    const booking = await Booking.findById(req.params.id)
       .populate("restaurantId", "name image address")
       .populate("hotelId", "name image location price");
 
@@ -140,79 +122,68 @@ const getBookingById = async (req, res) => {
       return res.status(404).json({ msg: "Booking not found" });
     }
 
-    // Check if user owns the booking or is admin
-    if (booking.user.toString() !== userId && req.user.role !== "admin") {
+    if (
+      booking.user.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
       return res.status(403).json({ msg: "Forbidden" });
     }
 
-    res.status(200).json(booking);
+    res.json(booking);
   } catch (error) {
-    console.error("Get booking error:", error);
     res.status(500).json({ msg: "Failed to fetch booking" });
   }
 };
 
-// Update booking status
+// ================= UPDATE BOOKING =================
 const updateBooking = async (req, res) => {
   try {
-    const userId = req.user?.id;
-    const { id } = req.params;
-    const { status, specialRequests } = req.body;
-
-    const booking = await Booking.findById(id);
+    const booking = await Booking.findById(req.params.id);
 
     if (!booking) {
       return res.status(404).json({ msg: "Booking not found" });
     }
 
-    // Check if user owns the booking or is admin
-    if (booking.user.toString() !== userId && req.user.role !== "admin") {
+    if (
+      booking.user.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
       return res.status(403).json({ msg: "Forbidden" });
     }
 
-    const updateData = {};
-    if (status) {
-      updateData.status = status;
-    }
-    if (specialRequests !== undefined) {
-      updateData.specialRequests = specialRequests;
-    }
-
-    const updatedBooking = await Booking.findByIdAndUpdate(id, updateData, {
-      new: true,
-    })
+    const updatedBooking = await Booking.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    )
       .populate("restaurantId", "name image address")
       .populate("hotelId", "name image location price");
 
-    res.status(200).json({ msg: "Booking updated successfully", booking: updatedBooking });
+    res.json(updatedBooking);
   } catch (error) {
-    console.error("Update booking error:", error);
     res.status(500).json({ msg: "Failed to update booking" });
   }
 };
 
-// Delete a booking
+// ================= DELETE BOOKING =================
 const deleteBooking = async (req, res) => {
   try {
-    const userId = req.user?.id;
-    const { id } = req.params;
-
-    const booking = await Booking.findById(id);
+    const booking = await Booking.findById(req.params.id);
 
     if (!booking) {
       return res.status(404).json({ msg: "Booking not found" });
     }
 
-    // Check if user owns the booking or is admin
-    if (booking.user.toString() !== userId && req.user.role !== "admin") {
+    if (
+      booking.user.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
       return res.status(403).json({ msg: "Forbidden" });
     }
 
-    await Booking.findByIdAndDelete(id);
-
-    res.status(200).json({ msg: "Booking deleted successfully" });
+    await Booking.findByIdAndDelete(req.params.id);
+    res.json({ msg: "Booking deleted successfully" });
   } catch (error) {
-    console.error("Delete booking error:", error);
     res.status(500).json({ msg: "Failed to delete booking" });
   }
 };
@@ -224,4 +195,3 @@ module.exports = {
   updateBooking,
   deleteBooking,
 };
-

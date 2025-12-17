@@ -1,6 +1,4 @@
-// src/utils/jwt.js
 
-// Safe JWT decoder (no external library)
 export function decodeJwt(token) {
   try {
     if (!token) return null;

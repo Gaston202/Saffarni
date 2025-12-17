@@ -18,7 +18,7 @@ import {
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
-import { AuthContext } from "@/context/auth";
+import { AuthContext } from "@/context/AuthContext";
 
 function SignUp() {
   const navigate = useNavigate();

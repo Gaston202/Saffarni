@@ -5,7 +5,7 @@ import SaffarniLogo from "../assets/SaffarniLogo.png";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useContext } from "react";
-import { AuthContext } from "@/context/auth";
+import { AuthContext } from "@/context/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);

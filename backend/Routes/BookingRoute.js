@@ -9,12 +9,19 @@ const {
   deleteBooking,
 } = require("../Controllers/BookingController");
 
-// All booking routes require authentication
+// Create booking
 bookingRoute.post("/bookings", isAuth, createBooking);
-bookingRoute.get("/bookings", isAuth, getUserBookings);
+
+// Get MY bookings (important)
+bookingRoute.get("/bookings/my", isAuth, getUserBookings);
+
+// Get booking by id
 bookingRoute.get("/bookings/:id", isAuth, getBookingById);
+
+// Update booking
 bookingRoute.put("/bookings/:id", isAuth, updateBooking);
+
+// Delete booking
 bookingRoute.delete("/bookings/:id", isAuth, deleteBooking);
 
 module.exports = bookingRoute;
-
