@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Footer from "../components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -475,7 +474,6 @@ const HotelsPage = () => {
           )}
         </DialogContent>
       </Dialog>
-      <Footer />
     </>
   );
 };

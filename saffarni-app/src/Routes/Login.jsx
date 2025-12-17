@@ -1,6 +1,8 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:6005/api";
 
@@ -15,9 +17,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "@/context/AuthContext";
+
+import { AuthContext } from "@/context/auth";
+import { decodeJwt } from "@/utils/jwt";
 import logo from "@/assets/logo.jpg";
 
 function Login() {
@@ -31,7 +33,7 @@ function Login() {
 
   const { login } = useContext(AuthContext);
 
-  // 🔥 LOGIN FUNCTION (connects to backend)
+  // LOGIN FUNCTION
   const onLogin = async (data) => {
     try {
       const result = await axios.post(`${API_URL}/signin`, {
@@ -39,11 +41,24 @@ function Login() {
         password: data.password,
       });
 
-      // Save token + user to context (and localStorage via provider)
-      login(result.data.user, result.data.token);
+      // Save token and populate AuthContext
+      const maybeUser = await login(result.data.token);
 
-      alert("Logged in successfully!");
-      navigate("/"); // redirect to homepage
+      // Get role (from context or token)
+      const decoded = decodeJwt(result.data.token) || {};
+      const role = maybeUser?.role || decoded.role;
+
+      if (!role) {
+        alert("Logged in but role unknown");
+        return;
+      }
+
+      alert(`Logged in successfully! Role: ${role}`);
+
+      // Role-based redirection
+      if (role === "admin") navigate("/admin");
+      else navigate("/profile");
+
     } catch (error) {
       console.error(error);
       alert(error.response?.data?.msg || "Login failed");
@@ -108,6 +123,7 @@ function Login() {
             <div className="text-sm text-gray-600">
               Don’t have an account?
               <Button
+                type="button"
                 variant="link"
                 className="text-[#e96642] hover:text-[#ff744f] ml-1"
                 onClick={() => navigate("/signup")}

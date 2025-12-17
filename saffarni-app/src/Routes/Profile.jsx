@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:6005/api";
-import { AuthContext } from "@/context/AuthContext";
+import { AuthContext } from "@/context/auth";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 
-const defaultPhoto = "https://share.google/images/QFvovGn5ruxb6tfk4";
+const defaultPhoto = "https://ui-avatars.com/api/?name=User&background=ff6b3d&color=fff";
 
 const STYLE_OPTIONS = [
   "Adventure",

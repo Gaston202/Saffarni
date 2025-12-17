@@ -1,5 +1,4 @@
 import Hero from "../components/Hero";
-import Footer from "../components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -308,7 +307,6 @@ const HomePage = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

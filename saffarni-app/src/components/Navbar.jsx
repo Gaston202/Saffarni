@@ -5,11 +5,11 @@ import SaffarniLogo from "../assets/SaffarniLogo.png";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useContext } from "react";
-import { AuthContext } from "@/context/AuthContext";
+import { AuthContext } from "@/context/auth";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, loading } = useContext(AuthContext);
 
   const navLinks = [
     { name: "Destinations", path: "/destinations" },
@@ -24,7 +24,7 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-6">
         <nav className="flex items-center justify-between">
-          {/* Logo */}
+       
           <Link to="/" className="flex items-center">
             <img
               src={SaffarniLogo}
@@ -49,7 +49,9 @@ const Navbar = () => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden lg:flex items-center gap-4">
-            {!user ? (
+            {loading ? (
+              <div style={{ width: 120 }} />
+            ) : !user ? (
               <>
                 <Button
                   variant="ghost"
@@ -66,8 +68,25 @@ const Navbar = () => {
                   <Link to="/signup">Get Started</Link>
                 </Button>
               </>
-            ) : (
+                ) : (
               <>
+                {user.role === "admin" && (
+                  <Button
+                    className="bg-[#1f3a63] hover:bg-[#152952] text-white font-medium px-6 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+                    asChild
+                  >
+                    <Link to="/admin">Admin Dashboard</Link>
+                  </Button>
+                )}
+
+                {user?.role === "admin" && (
+                  <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 rounded-full">
+                    <span className="text-sm font-medium text-[#1f3a63]">
+                      Admin
+                    </span>
+                  </div>
+                )}
+
                 <Button
                   className="bg-[#DF6951] hover:bg-[#c85a48] text-white font-medium px-6 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
                   asChild
@@ -83,7 +102,7 @@ const Navbar = () => {
                   Logout
                 </Button>
               </>
-            )}
+                )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -122,10 +141,11 @@ const Navbar = () => {
                   ))}
                 </div>
 
-                {/* Mobile Auth Buttons */}
-                {/* Mobile Auth Buttons */}
+            
                 <div className="flex flex-col gap-3 mt-6">
-                  {!user ? (
+                  {loading ? (
+                    <div className="h-8" />
+                  ) : !user ? (
                     <>
                       <Button
                         variant="outline"
@@ -148,6 +168,23 @@ const Navbar = () => {
                     </>
                   ) : (
                     <>
+                      {user.role === "admin" && (
+                        <Button
+                          className="w-full bg-[#1f3a63] hover:bg-[#152952] text-white font-medium"
+                          asChild
+                        >
+                          <Link to="/admin" onClick={() => setIsOpen(false)}>
+                            👑 Admin Dashboard
+                          </Link>
+                        </Button>
+                      )}
+
+                      <div className="px-3 py-2 bg-blue-100 rounded-full text-center">
+                        <span className="text-sm font-medium text-[#1f3a63]">
+                          Role: {user.role === "admin" ? "👑 Admin" : "👤 User"}
+                        </span>
+                      </div>
+
                       <Button
                         className="w-full bg-[#DF6951] hover:bg-[#c85a48] text-white font-medium"
                         asChild
