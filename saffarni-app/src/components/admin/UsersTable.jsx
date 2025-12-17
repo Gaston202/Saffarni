@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { useContext } from "react";
-import { AuthContext } from "@/context/auth";
+import { AuthContext } from "@/context/AuthContext";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:6005/api";
 

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:6005/api";
-import { AuthContext } from "@/context/auth";
+import { AuthContext } from "@/context/AuthContext";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,8 +44,9 @@ const TRAVEL_FREQUENCY_OPTIONS = [
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { user, token, logout, refreshUser } = useContext(AuthContext);
-  const isAuthenticated = user ? true : false;
+  const { user, token, logout } = useContext(AuthContext);
+ 
+const [trips, setTrips] = useState([]);
 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -64,158 +65,179 @@ export default function Profile() {
     travelFrequency: "",
     favoriteCity: "",
   });
+  useEffect(() => {
+  const fetchTrips = async () => {
+    if (!token) return;
+
+    try {
+      const res = await axios.get(`${API_URL}/trips/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setTrips(Array.isArray(res.data) ? res.data : res.data.trips || []);
+
+    } catch (err) {
+      console.error("Error fetching trips:", err);
+    }
+  };
+
+  if (!loading && token) {
+    fetchTrips();
+  }
+}, [loading, token]);
+
 
   // Load profile on mount / auth change
   useEffect(() => {
-    const load = async () => {
+  const load = async () => {
+    try {
+      if (user) {
+        setProfile(user);
+      } else {
+        const stored = localStorage.getItem("user");
+        if (stored) setProfile(JSON.parse(stored));
+      }
+    } catch (err) {
+      console.error("Error loading profile:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  load();
+}, [user, token]);
+
+// ✅ Redirect to login ONLY after loading is finished
+useEffect(() => {
+  if (!loading && !user) {
+    navigate("/login");
+  }
+}, [loading, user, navigate]);
+
+const handleLogout = () => logout();
+
+// ------- PHOTO UPLOAD -------
+const handlePhotoUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  try {
+    const reader = new FileReader();
+
+    reader.onloadend = async () => {
+      const base64Image = reader.result;
+
+      // Update UI immediately
+      setProfile((prev) => ({
+        ...(prev || {}),
+        photo: base64Image,
+      }));
+
       try {
-        if (user) {
-          const fresh = await refreshUser();
-          setProfile(fresh || user);
-        } else {
-          const stored = localStorage.getItem("user");
-          if (stored) setProfile(JSON.parse(stored));
-        }
+        await axios.put(
+          `${API_URL}/users/updateProfile`,
+          { photo: base64Image },
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }
+        );
       } catch (err) {
-        console.error("Error loading profile:", err);
-      } finally {
-        setLoading(false);
+        console.error("Error saving photo on backend:", err);
       }
     };
-    load();
-  }, [user, token, refreshUser]);
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-    }
-  }, [isAuthenticated, navigate]);
-
-  const handleLogout = () => logout();
-
-  // ------- PHOTO UPLOAD -------
-  const handlePhotoUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    try {
-      const reader = new FileReader();
-
-      reader.onloadend = async () => {
-        const base64Image = reader.result;
-
-        // Update UI immediately
-        setProfile((prev) => ({
-          ...(prev || {}),
-          photo: base64Image,
-        }));
-
-        try {
-          await axios.put(
-            `${API_URL}/users/updateProfile`,
-            { photo: base64Image },
-            {
-              headers: token ? { Authorization: `Bearer ${token}` } : {},
-            }
-          );
-            // refresh profile from backend to get normalized data
-            if (refreshUser) await refreshUser();
-        } catch (err) {
-          console.error("Error saving photo on backend:", err);
-        }
-      };
-
-      reader.readAsDataURL(file);
-    } catch (err) {
-      console.error("Failed to upload photo:", err);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-xl text-gray-600">
-        Loading profile...
-      </div>
-    );
+    reader.readAsDataURL(file);
+  } catch (err) {
+    console.error("Failed to upload photo:", err);
   }
+};
 
-  const displayUser = profile || {};
-  const trips = displayUser?.trips ?? [];
-  const prefs = displayUser?.preferences ?? {};
+if (loading) {
+  return (
+    <div className="min-h-screen flex items-center justify-center text-xl text-gray-600">
+      Loading profile...
+    </div>
+  );
+}
 
-  // ------- OPEN DIALOGS WITH INITIAL VALUES -------
+const displayUser = profile || {};
 
-  const openProfileDialog = () => {
-    setProfileForm({
-      userName: displayUser.userName || "",
-      email: displayUser.email || "",
-    });
-    setIsProfileDialogOpen(true);
-  };
 
-  const openPrefsDialog = () => {
-    setPrefsForm({
-      style: Array.isArray(prefs.style) ? prefs.style : [],
-      budgetRange: prefs.budgetRange || "",
-      travelFrequency: prefs.travelFrequency || "",
-      favoriteCity: prefs.favoriteCity || "",
-    });
-    setIsPrefsDialogOpen(true);
-  };
+const prefs = displayUser?.preferences ?? {};
 
-  // ------- SAVE HANDLERS -------
 
-  const handleSaveProfile = async () => {
-    try {
-      const res = await axios.put(
-        `${API_URL}/users/updateProfile`,
-        {
-          userName: profileForm.userName,
-          email: profileForm.email,
-        },
-        {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        }
-      );
 
-      // refresh user from backend to keep context and UI in sync
-      const fresh = refreshUser ? await refreshUser() : null;
-      setProfile(fresh || res.data?.user || {});
-      setIsProfileDialogOpen(false);
-    } catch (err) {
-      console.error("Error updating profile:", err);
-    }
-  };
+// ------- OPEN DIALOGS WITH INITIAL VALUES -------
 
-  const handleSavePreferences = async () => {
-    try {
-      const payload = {
-        style: prefsForm.style,
-        budgetRange:
-          prefsForm.budgetRange !== ""
-            ? Number(prefsForm.budgetRange)
-            : null,
-        travelFrequency: prefsForm.travelFrequency,
-        favoriteCity: prefsForm.favoriteCity,
-      };
+const openProfileDialog = () => {
+  setProfileForm({
+    userName: displayUser.userName || "",
+    email: displayUser.email || "",
+  });
+  setIsProfileDialogOpen(true);
+};
 
-      const res = await axios.put(
-        `${API_URL}/users/updatePreferences`,
-        payload,
-        {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        }
-      );
+const openPrefsDialog = () => {
+  setPrefsForm({
+    style: Array.isArray(prefs.style) ? prefs.style : [],
+    budgetRange: prefs.budgetRange || "",
+    travelFrequency: prefs.travelFrequency || "",
+    favoriteCity: prefs.favoriteCity || "",
+  });
+  setIsPrefsDialogOpen(true);
+};
 
-      // refresh user so preferences are reflected in context/profile
-      const fresh = refreshUser ? await refreshUser() : null;
-      setProfile((prev) => ({ ...(prev || {}), preferences: fresh?.preferences || res.data?.preferences || payload }));
-      setIsPrefsDialogOpen(false);
-    } catch (err) {
-      console.error("Error updating preferences:", err);
-    }
-  };
+// ------- SAVE HANDLERS -------
+
+const handleSaveProfile = async () => {
+  try {
+    const res = await axios.put(
+      `${API_URL}/users/updateProfile`,
+      {
+        userName: profileForm.userName,
+        email: profileForm.email,
+      },
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      }
+    );
+
+    setProfile(res.data?.user || user);
+    setIsProfileDialogOpen(false);
+  } catch (err) {
+    console.error("Error updating profile:", err);
+  }
+};
+
+const handleSavePreferences = async () => {
+  try {
+    const payload = {
+      style: prefsForm.style,
+      budgetRange:
+        prefsForm.budgetRange !== ""
+          ? Number(prefsForm.budgetRange)
+          : null,
+      travelFrequency: prefsForm.travelFrequency,
+      favoriteCity: prefsForm.favoriteCity,
+    };
+
+    const res = await axios.put(
+      `${API_URL}/users/updatePreferences`,
+      payload,
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      }
+    );
+
+    setProfile((prev) => ({
+      ...(prev || {}),
+      preferences: res.data?.preferences || payload,
+    }));
+
+    setIsPrefsDialogOpen(false);
+  } catch (err) {
+    console.error("Error updating preferences:", err);
+  }
+};
 
   // ------- STYLE CHECKBOX TOGGLE -------
   const toggleStyleOption = (option) => {
@@ -390,43 +412,49 @@ export default function Profile() {
       </div>
 
       {/* My Trips Section */}
-      <div className="max-w-5xl mx-auto mt-12">
-        <h2 className="text-2xl font-semibold text-[#1f3a63] mb-6">
-          My Trips
-        </h2>
+      {/* My Trips Section */}
+<div className="max-w-5xl mx-auto mt-12">
+  <h2 className="text-2xl font-semibold text-[#1f3a63] mb-6">
+    My Trips
+  </h2>
 
-        {trips.length === 0 ? (
-          <p className="text-gray-500 text-center">No trips added yet.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trips.map((trip) => (
-              <Card
-                key={trip.id}
-                className="overflow-hidden border border-gray-100 rounded-2xl shadow-sm"
-              >
-                <img
-                  src={trip.image}
-                  alt={trip.title}
-                  className="h-40 w-full object-cover"
-                />
+  {trips.length === 0 ? (
+    <p className="text-gray-500 text-center">No trips added yet.</p>
+  ) : (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {trips.map((trip) => (
+        <Card
+          key={trip._id}
+          className="overflow-hidden border border-gray-100 rounded-2xl shadow-sm"
+        >
+          <img
+            src={trip.destination?.image}
+            alt={trip.destination?.title || "Trip"}
+            className="h-40 w-full object-cover"
+          />
 
-                <CardContent className="p-4">
-                  <h3 className="text-lg font-semibold text-[#1f3a63]">
-                    {trip.title}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {trip.date} • {trip.duration}
-                  </p>
+          <CardContent className="p-4">
+            <h3 className="text-lg font-semibold text-[#1f3a63]">
+              {trip.destination?.title || "Trip"}
+            </h3>
 
-                  <Button className="mt-3 bg-[#ff6b3d] hover:bg-[#ff8059] text-white w-full">
-                    View Details
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
+            <p className="text-sm text-gray-500">
+              {trip.destination?.location || "Unknown location"}
+            </p>
+
+            <p className="text-xs text-gray-400 mt-1">
+              Created on{" "}
+              {new Date(trip.createdAt).toLocaleDateString()}
+            </p>
+
+            
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  )}
+</div>
+
 
       {/* -------- MODALS / DIALOGS -------- */}
 

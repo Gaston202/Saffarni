@@ -10,6 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, X, Utensils, Building2, MapPin, Star, Loader2, Wifi, Coffee, ParkingCircle, Waves, Dumbbell, Calendar } from "lucide-react";
+import { tripService } from "../services/tripService";
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
+
+
 
 const TripCustomizationPage = () => {
   const { destinationId } = useParams();
@@ -22,6 +27,7 @@ const TripCustomizationPage = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+const { token } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,9 +52,28 @@ const TripCustomizationPage = () => {
       fetchData();
     }
   }, [destinationId]);
+const handleSaveTrip = async () => {
+  try {
+    const payload = {
+      destination: destination._id || destination.id,
+      restaurants: selectedItems.restaurants.map(getItemId),
+      hotels: selectedItems.hotels.map(getItemId),
+      places: selectedItems.places.map(getItemId),
+    };
+
+    await tripService.createTrip(payload, token);
+    alert("Trip saved successfully!");
+    navigate("/profile");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to save trip");
+  }
+};
 
   // Fetch bookings
   const fetchBookings = async () => {
+    if (!token) return;
+
     try {
       setBookingsLoading(true);
       const allBookings = await bookingService.getUserBookings();
@@ -84,10 +109,16 @@ const TripCustomizationPage = () => {
   };
 
   useEffect(() => {
-    if (destinationId && (details.restaurants.length > 0 || details.hotels.length > 0)) {
-      fetchBookings();
-    }
-  }, [destinationId, details.restaurants.length, details.hotels.length]);
+  if (!token) return;
+
+  if (
+    destinationId &&
+    (details.restaurants.length > 0 || details.hotels.length > 0)
+  ) {
+    fetchBookings();
+  }
+}, [token, destinationId, details.restaurants.length, details.hotels.length]);
+
 
   const [selectedItems, setSelectedItems] = useState({
     restaurants: [],
@@ -543,7 +574,8 @@ const TripCustomizationPage = () => {
               </div>
 
               {totalSelected > 0 && (
-                <Button className="w-full bg-[#DF6951] text-white hover:bg-[#c85a48]">
+                <Button className="w-full bg-[#DF6951] text-white hover:bg-[#c85a48]"
+                onClick={handleSaveTrip}>
                   Save Trip Plan
                 </Button>
               )}

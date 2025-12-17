@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
-import { AuthContext } from "@/context/auth";
+import { AuthContext } from "@/context/AuthContext";
 import { decodeJwt } from "@/utils/jwt";
 import logo from "@/assets/logo.jpg";
 

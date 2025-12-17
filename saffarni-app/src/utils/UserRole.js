@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { AuthContext } from "@/context/auth";
+import { AuthContext } from "@/context/AuthContext";
 
 // Hook used by components (Navbar) to access auth state
 export function useAuth() {

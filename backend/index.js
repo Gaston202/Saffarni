@@ -21,7 +21,8 @@ const ActivityRoute = require("./Routes/ActivityRoute");
 const DestinationRoute = require("./Routes/DestinationRoute"); 
 const adminRoutes = require("./Routes/adminRoutes");
 const BookingRoute = require("./Routes/BookingRoute");
-const tripRoutes = require("./Routes/TripRoute");
+const tripRoutes = require("./Routes/tripRoutes");
+
 
 // Database connection
 connectDb();
@@ -33,7 +34,8 @@ app.use("/api", ActivityRoute); // activity routes base path
 app.use("/api", DestinationRoute); // destination routes base path
 app.use("/api", BookingRoute); // booking routes
 app.use("/api/admin", adminRoutes); // admin routes
-app.use("/api", tripRoutes); // trip routes (user-facing)
+app.use("/api/trips", tripRoutes);
+
 
 // Start server (only when not in Vercel serverless environment)
 const port = process.env.PORT || 6005;
