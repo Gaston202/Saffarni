@@ -20,11 +20,8 @@ const userRoute = require("./Routes/UserRoute");
 const ActivityRoute = require("./Routes/ActivityRoute");
 const DestinationRoute = require("./Routes/DestinationRoute"); 
 const adminRoutes = require("./Routes/adminRoutes");
-<<<<<<< HEAD
 const BookingRoute = require("./Routes/BookingRoute");
-=======
 const tripRoutes = require("./Routes/TripRoute");
->>>>>>> 42605744cd047e2c6f2f6abc180f37c38a6583f0
 
 // Database connection
 connectDb();

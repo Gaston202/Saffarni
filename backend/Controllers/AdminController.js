@@ -4,12 +4,7 @@ const Hotel = require("../Models/Hotel");
 const Destination = require("../Models/Destination");
 const Activity = require("../Models/Activity");
 
-/**
- * ===============================
- * GET ALL USERS (ADMIN)
- * ===============================
- * GET /api/admin/users
- */
+
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password");
@@ -21,12 +16,7 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-/**
- * ===============================
- * DELETE USER (ADMIN)
- * ===============================
- * DELETE /api/admin/users/:id
- */
+
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -51,13 +41,7 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-/**
- * ===============================
- * CHANGE USER ROLE (ADMIN)
- * ===============================
- * PATCH /api/admin/users/:id/role
- * body: { role: "admin" | "user" }
- */
+
 exports.changeUserRole = async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,12 +71,7 @@ exports.changeUserRole = async (req, res) => {
   }
 };
 
-/**
- * ===============================
- * GET ALL TRIPS (ADMIN)
- * ===============================
- * GET /api/admin/trips
- */
+
 exports.getAllTrips = async (req, res) => {
   try {
     const trips = await Trip.find()
@@ -106,12 +85,7 @@ exports.getAllTrips = async (req, res) => {
   }
 };
 
-/**
- * ===============================
- * DELETE TRIP (ADMIN)
- * ===============================
- * DELETE /api/admin/trips/:id
- */
+
 exports.deleteTrip = async (req, res) => {
   try {
     const { id } = req.params;
@@ -129,11 +103,6 @@ exports.deleteTrip = async (req, res) => {
   }
 };
 
-/**
- * ===============================
- * HOTELS MANAGEMENT (ADMIN)
- * ===============================
- */
 
 // GET ALL HOTELS
 exports.getAllHotels = async (req, res) => {
@@ -192,11 +161,7 @@ exports.deleteHotel = async (req, res) => {
   }
 };
 
-/**
- * ===============================
- * DESTINATIONS MANAGEMENT (ADMIN)
- * ===============================
- */
+
 
 // GET ALL DESTINATIONS
 exports.getAllDestinations = async (req, res) => {
@@ -257,11 +222,7 @@ exports.deleteDestination = async (req, res) => {
   }
 };
 
-/**
- * ===============================
- * ACTIVITIES MANAGEMENT (ADMIN)
- * ===============================
- */
+
 
 // GET ALL ACTIVITIES
 exports.getAllActivities = async (req, res) => {
