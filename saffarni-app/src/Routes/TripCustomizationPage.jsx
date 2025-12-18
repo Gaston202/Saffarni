@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, X, Utensils, Building2, MapPin, Star, Loader2, Wifi, Coffee, ParkingCircle, Waves, Dumbbell, Calendar } from "lucide-react";
+import { ArrowLeft, X, Utensils, Building2, MapPin, Star, Loader2, Wifi, Coffee, ParkingCircle, Waves, Dumbbell, Calendar, Edit, Trash2 } from "lucide-react";
 import { tripService } from "../services/tripService";
 import { useContext } from "react";
 import { AuthContext } from "@/context/AuthContext";
@@ -131,6 +131,7 @@ const handleSaveTrip = async () => {
   const [reservationType, setReservationType] = useState(null); // "restaurant" or "hotel"
   const [reservationItem, setReservationItem] = useState(null);
   const [reservationLoading, setReservationLoading] = useState(false);
+  const [editingBooking, setEditingBooking] = useState(null); // Store the booking being edited
 
   // Restaurant reservation form state
   const [restaurantReservation, setRestaurantReservation] = useState({
@@ -186,6 +187,7 @@ const handleSaveTrip = async () => {
   const openReservationDialog = (type, item) => {
     setReservationType(type);
     setReservationItem(item);
+    setEditingBooking(null);
     setReservationDialogOpen(true);
     
     // Reset forms
@@ -207,57 +209,134 @@ const handleSaveTrip = async () => {
     }
   };
 
-  // Handle reservation submission
+  // Handle reservation submission (create or update)
   const handleReservationSubmit = async () => {
     try {
       setReservationLoading(true);
       
-      let bookingData = {};
-      
-      if (reservationType === "restaurant") {
-        if (!restaurantReservation.date || !restaurantReservation.time || !restaurantReservation.numberOfGuests) {
-          alert("Please fill in all required fields");
-          setReservationLoading(false);
-          return;
-        }
-        
-        bookingData = {
-          type: "restaurant",
-          restaurantId: reservationItem._id || reservationItem.id,
-          reservationDate: restaurantReservation.date,
-          reservationTime: restaurantReservation.time,
-          numberOfGuests: parseInt(restaurantReservation.numberOfGuests),
-          specialRequests: restaurantReservation.specialRequests,
+      if (editingBooking) {
+        // Update existing booking
+        const updateData = {
+          specialRequests: reservationType === "restaurant" 
+            ? restaurantReservation.specialRequests 
+            : hotelReservation.specialRequests,
         };
-      } else if (reservationType === "hotel") {
-        if (!hotelReservation.checkInDate || !hotelReservation.checkOutDate || !hotelReservation.numberOfRooms) {
-          alert("Please fill in all required fields");
-          setReservationLoading(false);
-          return;
-        }
         
-        bookingData = {
-          type: "hotel",
-          hotelId: reservationItem._id || reservationItem.id,
-          checkInDate: hotelReservation.checkInDate,
-          checkOutDate: hotelReservation.checkOutDate,
-          numberOfRooms: parseInt(hotelReservation.numberOfRooms),
-          numberOfGuests: parseInt(hotelReservation.numberOfGuests),
-          specialRequests: hotelReservation.specialRequests,
-        };
-      }
+        await bookingService.updateBooking(editingBooking._id, updateData);
+        alert("Reservation updated successfully!");
+      } else {
+        // Create new booking
+        let bookingData = {};
+        
+        if (reservationType === "restaurant") {
+          if (!restaurantReservation.date || !restaurantReservation.time || !restaurantReservation.numberOfGuests) {
+            alert("Please fill in all required fields");
+            setReservationLoading(false);
+            return;
+          }
+          
+          bookingData = {
+            type: "restaurant",
+            restaurantId: reservationItem._id || reservationItem.id,
+            reservationDate: restaurantReservation.date,
+            reservationTime: restaurantReservation.time,
+            numberOfGuests: parseInt(restaurantReservation.numberOfGuests),
+            specialRequests: restaurantReservation.specialRequests,
+          };
+        } else if (reservationType === "hotel") {
+          if (!hotelReservation.checkInDate || !hotelReservation.checkOutDate || !hotelReservation.numberOfRooms) {
+            alert("Please fill in all required fields");
+            setReservationLoading(false);
+            return;
+          }
+          
+          bookingData = {
+            type: "hotel",
+            hotelId: reservationItem._id || reservationItem.id,
+            checkInDate: hotelReservation.checkInDate,
+            checkOutDate: hotelReservation.checkOutDate,
+            numberOfRooms: parseInt(hotelReservation.numberOfRooms),
+            numberOfGuests: parseInt(hotelReservation.numberOfGuests),
+            specialRequests: hotelReservation.specialRequests,
+          };
+        }
 
-      await bookingService.createBooking(bookingData);
-      alert("Reservation created successfully!");
+        await bookingService.createBooking(bookingData);
+        alert("Reservation created successfully!");
+      }
+      
       setReservationDialogOpen(false);
+      setEditingBooking(null);
       // Refresh bookings
       fetchBookings();
     } catch (error) {
-      console.error("Error creating reservation:", error);
-      alert(error.response?.data?.msg || "Failed to create reservation. Please try again.");
+      console.error("Error saving reservation:", error);
+      alert(error.response?.data?.msg || "Failed to save reservation. Please try again.");
     } finally {
       setReservationLoading(false);
     }
+  };
+
+  // Handle delete booking
+  const handleDeleteBooking = async (bookingId) => {
+    if (!window.confirm("Are you sure you want to cancel this reservation?")) {
+      return;
+    }
+
+    try {
+      await bookingService.deleteBooking(bookingId);
+      alert("Reservation cancelled successfully!");
+      fetchBookings();
+    } catch (error) {
+      console.error("Error deleting booking:", error);
+      alert(error.response?.data?.msg || "Failed to cancel reservation. Please try again.");
+    }
+  };
+
+  // Handle update booking
+  const handleUpdateBooking = (booking) => {
+    setEditingBooking(booking);
+    setReservationType(booking.type);
+    
+    if (booking.type === "restaurant") {
+      const reservationDate = new Date(booking.reservationDate);
+      const dateStr = reservationDate.toISOString().split('T')[0];
+      const timeStr = booking.reservationTime || "";
+      
+      setRestaurantReservation({
+        date: dateStr,
+        time: timeStr,
+        numberOfGuests: booking.numberOfGuests || 1,
+        specialRequests: booking.specialRequests || "",
+      });
+      
+      // Find the restaurant item
+      const restaurant = details.restaurants.find(
+        (r) => (r._id || r.id) === (booking.restaurantId._id || booking.restaurantId)
+      );
+      setReservationItem(restaurant || booking.restaurantId);
+    } else {
+      const checkInDate = new Date(booking.checkInDate);
+      const checkOutDate = new Date(booking.checkOutDate);
+      const checkInStr = checkInDate.toISOString().split('T')[0];
+      const checkOutStr = checkOutDate.toISOString().split('T')[0];
+      
+      setHotelReservation({
+        checkInDate: checkInStr,
+        checkOutDate: checkOutStr,
+        numberOfRooms: booking.numberOfRooms || 1,
+        numberOfGuests: booking.numberOfGuests || 2,
+        specialRequests: booking.specialRequests || "",
+      });
+      
+      // Find the hotel item
+      const hotel = details.hotels.find(
+        (h) => (h._id || h.id) === (booking.hotelId._id || booking.hotelId)
+      );
+      setReservationItem(hotel || booking.hotelId);
+    }
+    
+    setReservationDialogOpen(true);
   };
 
   const totalSelected =
@@ -677,6 +756,34 @@ const handleSaveTrip = async () => {
                             <span>{booking.specialRequests}</span>
                           </div>
                         )}
+
+                        {/* Update and Delete Buttons */}
+                        <div className="flex gap-2 pt-2 border-t">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 text-xs"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUpdateBooking(booking);
+                            }}
+                          >
+                            <Edit className="w-3 h-3 mr-1" />
+                            Update
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteBooking(booking._id);
+                            }}
+                          >
+                            <Trash2 className="w-3 h-3 mr-1" />
+                            Delete
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -692,7 +799,7 @@ const handleSaveTrip = async () => {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              Reserve {reservationType === "restaurant" ? "Restaurant" : "Hotel"}
+              {editingBooking ? "Update" : "Reserve"} {reservationType === "restaurant" ? "Restaurant" : "Hotel"}
             </DialogTitle>
             <DialogDescription>
               {reservationItem?.name}
@@ -701,42 +808,46 @@ const handleSaveTrip = async () => {
 
           {reservationType === "restaurant" ? (
             <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="reservation-date">Date *</Label>
-                <Input
-                  id="reservation-date"
-                  type="date"
-                  min={new Date().toISOString().split('T')[0]}
-                  value={restaurantReservation.date}
-                  onChange={(e) =>
-                    setRestaurantReservation({ ...restaurantReservation, date: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="reservation-time">Time *</Label>
-                <Input
-                  id="reservation-time"
-                  type="time"
-                  value={restaurantReservation.time}
-                  onChange={(e) =>
-                    setRestaurantReservation({ ...restaurantReservation, time: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="number-of-guests">Number of Guests *</Label>
-                <Input
-                  id="number-of-guests"
-                  type="number"
-                  min="1"
-                  max="20"
-                  value={restaurantReservation.numberOfGuests}
-                  onChange={(e) =>
-                    setRestaurantReservation({ ...restaurantReservation, numberOfGuests: e.target.value })
-                  }
-                />
-              </div>
+              {!editingBooking && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="reservation-date">Date *</Label>
+                    <Input
+                      id="reservation-date"
+                      type="date"
+                      min={new Date().toISOString().split('T')[0]}
+                      value={restaurantReservation.date}
+                      onChange={(e) =>
+                        setRestaurantReservation({ ...restaurantReservation, date: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="reservation-time">Time *</Label>
+                    <Input
+                      id="reservation-time"
+                      type="time"
+                      value={restaurantReservation.time}
+                      onChange={(e) =>
+                        setRestaurantReservation({ ...restaurantReservation, time: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="number-of-guests">Number of Guests *</Label>
+                    <Input
+                      id="number-of-guests"
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={restaurantReservation.numberOfGuests}
+                      onChange={(e) =>
+                        setRestaurantReservation({ ...restaurantReservation, numberOfGuests: e.target.value })
+                      }
+                    />
+                  </div>
+                </>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="special-requests">Special Requests</Label>
                 <textarea
@@ -749,59 +860,68 @@ const handleSaveTrip = async () => {
                   placeholder="Any special requests or dietary restrictions..."
                 />
               </div>
+              {editingBooking && (
+                <p className="text-xs text-muted-foreground italic">
+                  Note: Date, time, and number of guests cannot be changed. You can only update special requests.
+                </p>
+              )}
             </div>
           ) : (
             <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="check-in-date">Check-in Date *</Label>
-                <Input
-                  id="check-in-date"
-                  type="date"
-                  min={new Date().toISOString().split('T')[0]}
-                  value={hotelReservation.checkInDate}
-                  onChange={(e) =>
-                    setHotelReservation({ ...hotelReservation, checkInDate: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="check-out-date">Check-out Date *</Label>
-                <Input
-                  id="check-out-date"
-                  type="date"
-                  min={hotelReservation.checkInDate || new Date().toISOString().split('T')[0]}
-                  value={hotelReservation.checkOutDate}
-                  onChange={(e) =>
-                    setHotelReservation({ ...hotelReservation, checkOutDate: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="number-of-rooms">Number of Rooms *</Label>
-                <Input
-                  id="number-of-rooms"
-                  type="number"
-                  min="1"
-                  max="10"
-                  value={hotelReservation.numberOfRooms}
-                  onChange={(e) =>
-                    setHotelReservation({ ...hotelReservation, numberOfRooms: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="hotel-guests">Number of Guests *</Label>
-                <Input
-                  id="hotel-guests"
-                  type="number"
-                  min="1"
-                  max="50"
-                  value={hotelReservation.numberOfGuests}
-                  onChange={(e) =>
-                    setHotelReservation({ ...hotelReservation, numberOfGuests: e.target.value })
-                  }
-                />
-              </div>
+              {!editingBooking && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="check-in-date">Check-in Date *</Label>
+                    <Input
+                      id="check-in-date"
+                      type="date"
+                      min={new Date().toISOString().split('T')[0]}
+                      value={hotelReservation.checkInDate}
+                      onChange={(e) =>
+                        setHotelReservation({ ...hotelReservation, checkInDate: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="check-out-date">Check-out Date *</Label>
+                    <Input
+                      id="check-out-date"
+                      type="date"
+                      min={hotelReservation.checkInDate || new Date().toISOString().split('T')[0]}
+                      value={hotelReservation.checkOutDate}
+                      onChange={(e) =>
+                        setHotelReservation({ ...hotelReservation, checkOutDate: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="number-of-rooms">Number of Rooms *</Label>
+                    <Input
+                      id="number-of-rooms"
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={hotelReservation.numberOfRooms}
+                      onChange={(e) =>
+                        setHotelReservation({ ...hotelReservation, numberOfRooms: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="hotel-guests">Number of Guests *</Label>
+                    <Input
+                      id="hotel-guests"
+                      type="number"
+                      min="1"
+                      max="50"
+                      value={hotelReservation.numberOfGuests}
+                      onChange={(e) =>
+                        setHotelReservation({ ...hotelReservation, numberOfGuests: e.target.value })
+                      }
+                    />
+                  </div>
+                </>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="hotel-special-requests">Special Requests</Label>
                 <textarea
@@ -814,13 +934,21 @@ const handleSaveTrip = async () => {
                   placeholder="Any special requests..."
                 />
               </div>
+              {editingBooking && (
+                <p className="text-xs text-muted-foreground italic">
+                  Note: Check-in/check-out dates, rooms, and guests cannot be changed. You can only update special requests.
+                </p>
+              )}
             </div>
           )}
 
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setReservationDialogOpen(false)}
+              onClick={() => {
+                setReservationDialogOpen(false);
+                setEditingBooking(null);
+              }}
               disabled={reservationLoading}
             >
               Cancel
@@ -835,6 +963,8 @@ const handleSaveTrip = async () => {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Processing...
                 </>
+              ) : editingBooking ? (
+                "Update Reservation"
               ) : (
                 "Confirm Reservation"
               )}

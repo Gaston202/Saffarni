@@ -45,6 +45,7 @@ function App() {
             }
           />
 
+         
           <Route
             path="/hotels"
             element={
