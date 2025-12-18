@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { activityService } from "../services/activityService";
 import { AuthContext } from "@/context/AuthContext";
 
-
 import {
   Card,
   CardHeader,
@@ -24,18 +23,17 @@ import {
 // Remove experiences import
 // import { experiences } from "../data/experiencesData";
 
-import {
-  defaultFilters,
-  experienceTypes,
-  cities,
-} from "../data/experiencesData";
+import { experienceTypes, cities } from "../data/experiencesData";
 
 export default function Experiences() {
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
   const isAuthenticated = authContext?.user ? true : false;
 
-  const [filters, setFilters] = useState({ ...defaultFilters, city: "All" });
+  const [filters, setFilters] = useState({
+    category: "All",
+    city: "All",
+  });
   const [experiences, setExperiences] = useState([]); // DATA FROM BACKEND
   const [loading, setLoading] = useState(true);
 
@@ -70,10 +68,15 @@ export default function Experiences() {
   };
 
   const filteredExperiences = experiences.filter((exp) => {
-    const city = exp.destinationId?.title || "";
+    const category = exp.category?.toLowerCase() || "";
+    const city = exp.destinationId?.title?.toLowerCase() || "";
+
+    const selectedCategory = filters.category.toLowerCase();
+    const selectedCity = filters.city.toLowerCase();
+
     return (
-      (filters.type === "All" || exp.category === filters.type) &&
-      (filters.city === "All" || city === filters.city)
+      (filters.category === "All" || category === selectedCategory) &&
+      (filters.city === "All" || city === selectedCity)
     );
   });
 
@@ -101,20 +104,20 @@ export default function Experiences() {
             Filter by
           </h2>
 
-          {/* Type */}
+          {/* Category */}
           <div className="mb-6">
-            <h3 className="font-medium text-gray-700 mb-2">Type</h3>
+            <h3 className="font-medium text-gray-700 mb-2">Category</h3>
             <div className="flex flex-wrap gap-2">
-              {experienceTypes.map((t) => (
+              {experienceTypes.map((cat) => (
                 <Button
-                  key={t}
-                  variant={filters.type === t ? "default" : "outline"}
-                  onClick={() => setFilters({ ...filters, type: t })}
+                  key={cat}
+                  variant={filters.category === cat ? "default" : "outline"}
+                  onClick={() => setFilters({ ...filters, category: cat })}
                   className={
-                    filters.type === t ? "bg-[#ff6b3d] text-white" : ""
+                    filters.category === cat ? "bg-[#ff6b3d] text-white" : ""
                   }
                 >
-                  {t}
+                  {cat}
                 </Button>
               ))}
             </div>
@@ -163,7 +166,9 @@ export default function Experiences() {
                 </CardHeader>
 
                 <CardContent>
-                  <p className="text-sm text-gray-600">{exp.destinationId?.title}</p>
+                  <p className="text-sm text-gray-600">
+                    {exp.destinationId?.title}
+                  </p>
                   <p className="text-sm mt-1">
                     <span className="text-[#ff6b3d] font-medium">
                       {exp.category}

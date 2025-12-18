@@ -14,7 +14,7 @@ exports.createActivity = async (req, res) => {
 exports.getActivities = async (req, res) => {
   try {
     const activities = await Activity.find()
-      .populate("destinationId")
+      .populate("destinationId", "title")
       .select("title description price duration category imageUrl destinationId");
     res.status(200).json(activities);
   } catch (err) {

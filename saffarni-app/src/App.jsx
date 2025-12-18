@@ -4,7 +4,7 @@ import Login from "./Routes/Login";
 import HomePage from "./Routes/HomePage";
 import RecommendationPage from "./Routes/RecommendationPage";
 import TripCustomizationPage from "./Routes/TripCustomizationPage";
-import BookingsPage from "./Routes/BookingsPage";
+
 import HotelsPage from "./Routes/HotelsPage";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -46,15 +46,6 @@ function App() {
           />
 
           <Route
-            path="/bookings"
-            element={
-              <PrivateRoute>
-                <BookingsPage />
-              </PrivateRoute>
-            }
-          />
-
-          <Route
             path="/hotels"
             element={
               <PrivateRoute>
@@ -65,14 +56,13 @@ function App() {
 
           <Route path="/experiences" element={<Experiences />} />
           <Route
-  path="/profile"
-  element={
-    <PrivateRoute>
-      <Profile />
-    </PrivateRoute>
-  }
-/>
-
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
 
           <Route
             path="/admin"
