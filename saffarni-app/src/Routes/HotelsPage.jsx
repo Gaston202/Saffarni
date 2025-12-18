@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -23,23 +24,14 @@ import {
   Loader2,
 } from "lucide-react";
 import { hotelService } from "../services/hotelService";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
 
 const HotelsPage = () => {
+  const navigate = useNavigate();
   const [priceRange, setPriceRange] = useState([0, 2000]);
   const [selectedRating, setSelectedRating] = useState("all");
   const [allHotels, setAllHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedHotel, setSelectedHotel] = useState(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   // Fetch hotels from backend
   useEffect(() => {
@@ -277,10 +269,7 @@ const HotelsPage = () => {
                     {/* View Details Button */}
                     <Button
                       className="bg-[#DF6951] text-white hover:bg-[#c85a48] w-full mt-4"
-                      onClick={() => {
-                        setSelectedHotel(hotel);
-                        setIsDetailsOpen(true);
-                      }}
+                      onClick={() => navigate(`/hotels/${hotel._id}`)}
                     >
                       View Details
                     </Button>
@@ -385,95 +374,6 @@ const HotelsPage = () => {
           </div>
         </div>
       </div>
-      {/* Hotel Details Dialog */}
-      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-2xl">
-          {selectedHotel && (
-            <div>
-              <DialogHeader>
-                <DialogTitle
-                  className="text-2xl font-bold"
-                  style={{ color: "#255194" }}
-                >
-                  {selectedHotel.name}
-                </DialogTitle>
-                <DialogDescription className="mt-1">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <MapPin className="w-4 h-4" />
-                    <span>{selectedHotel.location}</span>
-                  </div>
-                </DialogDescription>
-              </DialogHeader>
-              <div className="mt-4">
-                <img
-                  src={selectedHotel.image}
-                  alt={selectedHotel.name}
-                  className="w-full h-64 object-cover rounded-lg mb-4"
-                />
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  {selectedHotel.description}
-                </p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {selectedHotel.amenities.map((amenity) => (
-                    <span
-                      key={amenity}
-                      className="px-3 py-1 bg-blue-50 rounded-full text-xs font-medium"
-                      style={{ color: "#255194" }}
-                    >
-                      {amenity}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-4">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="flex items-center gap-1 px-2 py-1 rounded"
-                      style={{ backgroundColor: "#DF6951" }}
-                    >
-                      <Star className="w-4 h-4 fill-white text-white" />
-                      <span className="text-sm font-semibold text-white">
-                        {selectedHotel.rating}
-                      </span>
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      ({selectedHotel.reviews} reviews)
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-500">From</p>
-                    <p
-                      className="text-3xl font-bold"
-                      style={{ color: "#DF6951" }}
-                    >
-                      ${selectedHotel.price}
-                    </p>
-                    <p className="text-xs text-gray-500">per night</p>
-                  </div>
-                </div>
-                {selectedHotel.availableRooms !== undefined && (
-                  <p className="mt-3 text-sm text-gray-600">
-                    <span
-                      className="font-semibold"
-                      style={{ color: "#255194" }}
-                    >
-                      {selectedHotel.availableRooms}
-                    </span>{" "}
-                    rooms currently available
-                  </p>
-                )}
-              </div>
-              <DialogFooter className="mt-6">
-                <Button
-                  className="bg-[#DF6951] text-white hover:bg-[#c85a48] w-full"
-                  onClick={() => setIsDetailsOpen(false)}
-                >
-                  Close
-                </Button>
-              </DialogFooter>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </>
   );
 };

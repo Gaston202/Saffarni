@@ -6,6 +6,7 @@ import RecommendationPage from "./Routes/RecommendationPage";
 import TripCustomizationPage from "./Routes/TripCustomizationPage";
 
 import HotelsPage from "./Routes/HotelsPage";
+import HotelDetailsPage from "./Routes/HotelDetailsPage";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Experiences from "./Routes/Experience";
@@ -51,6 +52,15 @@ function App() {
             element={
               <PrivateRoute>
                 <HotelsPage />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/hotels/:hotelId"
+            element={
+              <PrivateRoute>
+                <HotelDetailsPage />
               </PrivateRoute>
             }
           />
