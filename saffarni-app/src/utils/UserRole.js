@@ -1,15 +1,18 @@
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
 
-export function decodeJwt(token) {
-  try {
-    if (!token) return null;
-    const payload = token.split(".")[1];
-    if (!payload) return null;
+// Hook used by components (Navbar) to access auth state
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) return { isAuthenticated: false, user: null, logout: () => {}, loading: false };
 
-    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const json = atob(base64);
-    return JSON.parse(json);
-  } catch (err) {
-    console.error("decodeJwt failed", err);
-    return null;
-  }
+  const { user, logout, loading } = ctx;
+  return {
+    isAuthenticated: !!user,
+    user,
+    logout,
+    loading,
+  };
 }
+
+export default useAuth;
