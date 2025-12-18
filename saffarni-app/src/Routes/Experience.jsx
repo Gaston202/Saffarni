@@ -20,9 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Remove experiences import
-// import { experiences } from "../data/experiencesData";
-
 import { experienceTypes, cities } from "../data/experiencesData";
 
 export default function Experiences() {

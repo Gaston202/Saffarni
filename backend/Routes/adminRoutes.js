@@ -21,7 +21,7 @@ const {
 
 const router = express.Router();
 
-// 🔐 Auth + Admin authorization (CORRECT)
+// Auth + Admin authorization 
 router.use(isAuth);
 router.use(isAutho(["admin"]));
 

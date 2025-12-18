@@ -106,7 +106,7 @@ const [trips, setTrips] = useState([]);
   load();
 }, [user, token]);
 
-// ✅ Redirect to login ONLY after loading is finished
+// Redirect to login ONLY after loading is finished
 useEffect(() => {
   if (!loading && !user) {
     navigate("/login");
@@ -115,7 +115,7 @@ useEffect(() => {
 
 const handleLogout = () => logout();
 
-// ------- PHOTO UPLOAD -------
+// PHOTO UPLOAD 
 const handlePhotoUpload = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -164,9 +164,7 @@ const displayUser = profile || {};
 
 const prefs = displayUser?.preferences ?? {};
 
-
-
-// ------- OPEN DIALOGS WITH INITIAL VALUES -------
+// OPEN DIALOGS WITH INITIAL VALUES 
 
 const openProfileDialog = () => {
   setProfileForm({
@@ -186,7 +184,7 @@ const openPrefsDialog = () => {
   setIsPrefsDialogOpen(true);
 };
 
-// ------- SAVE HANDLERS -------
+// SAVE HANDLERS 
 
 const handleSaveProfile = async () => {
   try {
@@ -239,7 +237,7 @@ const handleSavePreferences = async () => {
   }
 };
 
-  // ------- STYLE CHECKBOX TOGGLE -------
+  // STYLE CHECKBOX TOGGLE
   const toggleStyleOption = (option) => {
     setPrefsForm((prev) => {
       const current = prev.style || [];
@@ -456,7 +454,7 @@ const handleSavePreferences = async () => {
 </div>
 
 
-      {/* -------- MODALS / DIALOGS -------- */}
+      {/*- MODALS / DIALOGS- */}
 
       {/* Edit Profile Dialog */}
       <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>

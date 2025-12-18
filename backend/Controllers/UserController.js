@@ -44,7 +44,7 @@ const postUser = async (req, res) => {
   try {
     const { userName, email, age, password } = req.body;
 
-    // Check for required fields (age is optional)
+    // Check for required fields 
     if (!userName || !email || !password) {
       return res.status(400).json({ msg: "Please fill required fields (userName, email, password)" });
     }
@@ -61,7 +61,6 @@ const postUser = async (req, res) => {
     const newUser = await User.create({
       userName,
       email,
-      // only include age if provided
       ...(age ? { age } : {}),
       password: hashedPassword,
     });
@@ -80,9 +79,9 @@ const postUser = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find({}, "-password"); // hide passwords
+    const users = await User.find({}, "-password"); 
     if (users.length === 0) {
-      return res.status(404).json({ msg: "No users found" });
+      return res.status(404).json({ msg: "No users found"});
     }
     res.status(200).json({ users });
   } catch (error) {
@@ -96,7 +95,6 @@ const getUsers = async (req, res) => {
 const getOneUser = async (req, res) => {
   try {
     const id = req.params.id;
-    // populate trips.activityId so frontend can display activity details
     const foundUser = await User.findById(id, "-password").populate({
       path: "trips.activityId",
       select: "title imageUrl duration destinationId price category",
@@ -111,7 +109,7 @@ const getOneUser = async (req, res) => {
   }
 };
 
-// UPDATE PROFILE (for logged in user)
+// UPDATE PROFILE 
 const updateProfile = async (req, res) => {
   try {
     const id = req.user?.id; // from isAuth middleware
@@ -136,7 +134,7 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// UPDATE PREFERENCES (for logged in user)
+// UPDATE PREFERENCES 
 const updatePreferences = async (req, res) => {
   try {
     const id = req.user?.id;

@@ -44,7 +44,7 @@ function Login() {
       // Save token and populate AuthContext
       const maybeUser = await login(result.data.token);
 
-      // Get role (from context or token)
+      // Get role
       const decoded = decodeJwt(result.data.token) || {};
       const role = maybeUser?.role || decoded.role;
 

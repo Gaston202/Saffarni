@@ -9,24 +9,25 @@ const {
   getOneUser,
   signIn,
 } = require("../Controllers/UserController");
+
 const { updateProfile, updatePreferences, addTrip } = require("../Controllers/UserController");
 
 const isAuth = require("../Middleware/isAuth");
 const isAutho = require("../Middleware/isAutho");
 
-// GET all users (admin only or public depending on your needs)
+// GET all users 
 userRoute.get("/users", getUsers);
 
-// GET one user (must be logged in + specific role allowed)
+// GET one user 
 userRoute.get("/users/:id", isAuth, isAutho(["user", "admin"]), getOneUser);
 
 // REGISTER a new user
 userRoute.post("/users", postUser);
 
-// Update profile (current logged in user)
+// Update profile 
 userRoute.put("/users/updateProfile", isAuth, updateProfile);
 
-// Update preferences (current logged in user)
+// Update preferences 
 userRoute.put("/users/updatePreferences", isAuth, updatePreferences);
 
 // Add trip to user's profile

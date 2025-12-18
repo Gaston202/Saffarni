@@ -31,7 +31,7 @@ function SignUp() {
     formState: { errors },
   } = useForm();
 
-  // ▶ REGISTER USER (fixed version: no unused vars)
+  // REGISTER USER 
   const onSubmit = async (data) => {
     try {
       // create account
@@ -48,7 +48,7 @@ function SignUp() {
         password: data.password,
       });
 
-      // call login from context (persists user+token)
+      // call login from context 
       login(signin.data.user, signin.data.token);
 
       alert("Account created and logged in!");
@@ -92,7 +92,7 @@ function SignUp() {
                   )}
                 </div>
 
-                {/* AGE (optional) */}
+                {/* AGE  */}
                 <div className="grid gap-2">
                   <Label htmlFor="age">Age (optional)</Label>
                   <Input

@@ -16,7 +16,7 @@ const userSchema = new Schema(
 
     age: {
       type: String,
-      required: false, // optional because your signup form does not require it
+      required: false, 
     },
 
     password: {
@@ -30,7 +30,7 @@ const userSchema = new Schema(
       default: "user",
     }
     ,
-    // optional photo stored as URL or base64 string
+    
     photo: {
       type: String,
       required: false,
@@ -47,14 +47,13 @@ const userSchema = new Schema(
       {
         activityId: { type: mongoose.Schema.Types.ObjectId, ref: "Activity" },
         addedAt: { type: Date, default: Date.now },
-        // snapshot fields to make rendering in profile simpler
         title: String,
         image: String,
         duration: String,
       },
     ],
   },
-  { timestamps: true } // automatically adds createdAt, updatedAt
+  { timestamps: true } 
 );
 
 const User = mongoose.model("User", userSchema);
