@@ -159,15 +159,6 @@ Authentication is JWT-based: protected endpoints expect an `Authorization: Beare
 
 ---
 
-## 🖼️ Screenshots
-
-> _Add screenshots or a GIF of the app here once available._
-
-| Home | Destinations | Booking |
-| --- | --- | --- |
-| _placeholder_ | _placeholder_ | _placeholder_ |
-
----
 
 ## 🗺️ Roadmap
 
